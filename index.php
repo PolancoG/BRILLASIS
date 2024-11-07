@@ -1,6 +1,7 @@
 <?php
     session_start();
     //Pass para admin: admin123 y user1234 para cajero. 
+    
 ?>
 <!doctype html>
 <html lang="en">
