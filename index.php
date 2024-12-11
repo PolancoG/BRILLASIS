@@ -1,6 +1,6 @@
 <?php
     session_start();
-    //Pass para admin: admin123 y user1234 para cajero. 
+    //Pass para admin: admin123 
     
 ?>
 <!doctype html>
@@ -25,7 +25,8 @@
 					<div class="col-md-6 col-lg-5">
 						<div class="login-wrap p-4 p-md-5">
                             <div class="icon d-flex align-items-center justify-content-center"> 
-                                <span class="fa fa-user"></span> 
+                                <!-- <span class="fa fa-user"></span>  -->
+                                <img src="imgs/logo.png" alt="image logo" class="logo-login">
                             </div>
                             <h3 class="text-center mb-4">Inicio de sesion</h3>
                             <form action="auth_login.php" method="POST" class="login-form">

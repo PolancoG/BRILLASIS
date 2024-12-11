@@ -8337,4 +8337,8 @@
         .form-group .submit {
           top: 0; } }
     
- 
+ .logo-login{
+    width: 90px; /* Ancho reducido */
+    height: 90px; /* Altura reducida (igual al ancho para mantener cuadrado) */
+    object-fit: cover;  /* Asegura que la imagen se mantenga centrada y ajustada */
+ }

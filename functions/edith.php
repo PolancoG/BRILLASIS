@@ -27,6 +27,7 @@ if (isset($_GET['id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'];
+    $numero_socio = $_POST['numero_socio'];
     $cedula = $_POST['cedula'];
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
@@ -36,12 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo_personal = $_POST['correo_personal'];
     $correo_institucional = $_POST['correo_institucional'];
 
-    $sql = "UPDATE cliente SET cedula = :cedula, nombre = :nombre, direccion = :direccion, lugar_trabajo = :lugar_trabajo,
+    $sql = "UPDATE cliente SET numero_socio = :numero_socio, cedula = :cedula, nombre = :nombre, direccion = :direccion, lugar_trabajo = :lugar_trabajo,
             telefono1 = :telefono1, telefono2 = :telefono2, correo_personal = :correo_personal, correo_institucional = :correo_institucional
             WHERE id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->execute([
         ':id' => $id,
+        ':numero_socio' => $numero_socio,
         ':cedula' => $cedula,
         ':nombre' => $nombre,
         ':direccion' => $direccion,
@@ -53,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     $_SESSION['mensaje'] = [
-        'texto' => 'Cliente actualizado correctamente!',
+        'texto' => 'Socio actualizado correctamente!',
         'tipo' => 'success'
     ];
 

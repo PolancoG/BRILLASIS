@@ -1,49 +1,46 @@
-(function () {
-    'use strict'
-  
-    feather.replace({ 'aria-hidden': 'true' })
-  
-    // Graphs
-    var ctx = document.getElementById("myChart")
-    // eslint-disable-next-line no-unused-vars
-    var myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [
-          'Usuarios',
-          'Clientes',
-          'Entradas en el sistema',
-          'Averias',
-          'Reportes',
-          'Otros'
-        ],
-        datasets: [{
-          data: [
-            6,
-            19,
-            34,
-            2,
-            10,
-            12
-          ],
-          lineTension: 0,
-          backgroundColor: 'transparent',
-          borderColor: '#007bff',
-          borderWidth: 4,
-          pointBackgroundColor: '#007bff'
-        }]
+function editarAhorro(button) {
+  var id = $(button).data('id');
+
+  // Llamada AJAX a get_ahorro.php para obtener los datos del ahorro
+  $.ajax({
+      url: '../functions/get_ahorro.php',
+      type: 'GET',
+      data: { id: id },
+      //dataType: 'json',
+      success: function(response) {
+          var ahorro = JSON.parse(response);
+          if (response.error) {
+              Swal.fire('Error', response.error, 'error');
+          } else {
+              // Llenar el formulario del modal con los datos recibidos
+              $('#edit_id').val(ahorro.id);
+              $('#edit_cliente_id').val(ahorro.cliente_id);
+              $('#edit_monto').val(ahorro.monto);
+              $('#edit_fecha').val(ahorro.fecha);
+
+              // Abrir el modal de edición
+              $('#modalEditarAhorro').modal('show');
+          }
       },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: false
-            }
-          }]
-        },
-        legend: {
-          display: false
-        }
+      error: function() {
+          Swal.fire('Error', 'Error al intentar obtener los datos.', 'error');
       }
-    })
-  })()
+  });
+} 
+
+// Confirmación de eliminación
+function eliminarAhorro(id) {
+  Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¡Este ahorro será eliminado permanentemente!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Eliminar"
+  }).then((result) => {
+      if (result.isConfirmed) {
+          window.location.href = "./functions/delete_ahorro.php?id=" + id;
+      }
+  });
+}

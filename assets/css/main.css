@@ -17,10 +17,10 @@
   --black2: #999;
 }
 
-body {
+/*body {
   min-height: 100vh;
   overflow-x: hidden;
-}
+}*/
 
 .container {
   position: relative;
@@ -235,8 +235,8 @@ body {
 
 .cardBox .card .numbers {
   position: relative;
-  font-weight: 500;
-  font-size: 2.5rem;
+  font-weight: 500; 
+  font-size: 1.5rem;
   color: var(--blue);
 }
 
@@ -332,8 +332,8 @@ body {
 }
 .status.delivered {
   padding: 2px 4px;
-  background: #8de02c;
-  color: var(--white);
+  background: #71bb1c;
+  color: var(--black1);
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -341,7 +341,7 @@ body {
 .status.pending {
   padding: 2px 4px;
   background: #e9b10a;
-  color: var(--white);
+  color: var(--black1);
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -349,7 +349,7 @@ body {
 .status.return {
   padding: 2px 4px;
   background: #f00;
-  color: var(--white);
+  color: var(--black1);
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;

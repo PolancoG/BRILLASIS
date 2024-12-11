@@ -15,9 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //echo "Usuario o contraseña incorrectos.";
         $var = "Usuario o clave incorrectos!";
         echo "  <script> 
-                    alert('".$var."'); 
+                    alert('".$var."');
                     window.location='index?'
-                </script>";
+                </script>"; 
     }
 }
 ?>

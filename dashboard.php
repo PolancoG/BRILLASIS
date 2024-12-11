@@ -10,13 +10,30 @@
     
     include 'db.php';
 
-    $sql = "SELECT COUNT(*) FROM usuarios";
+    $sql = "SELECT SUM(monto) FROM ahorro";
     $result = $conn->query($sql); //conn es el objeto conexión
     $total = $result->fetchColumn();
 
-    $sqli = "SELECT COUNT(*) FROM cliente";
+    $sqli = "SELECT COUNT(*) FROM compania";
     $results = $conn->query($sqli); //conn es el objeto conexión
     $totalcli = $results->fetchColumn();
+
+    $sqlp = "SELECT COUNT(*) FROM prestamo;";
+    $resultp = $conn->query($sqlp); //conn es el objeto conexión
+    $totalp = $resultp->fetchColumn();
+
+    
+    $sqlpr = "SELECT COUNT(*) FROM prestamo WHERE estado = 'activo_bien';";
+    $resultpr = $conn->query($sqlpr); //conn es el objeto conexión
+    $totalpr = $resultpr->fetchColumn();
+
+    $sqlpr1 = "SELECT COUNT(*) FROM prestamo WHERE estado = 'activo_problemas';";
+    $resultpr1 = $conn->query($sqlpr1); //conn es el objeto conexión
+    $totalpr1 = $resultpr1->fetchColumn();
+
+    $sqlcli = "SELECT COUNT(*) FROM cliente";
+    $resultcli = $conn->query($sqlcli); //conn es el objeto conexión
+    $totalClientes = $resultcli->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,11 +46,13 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" href="imgs/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/logo.css">
 
     <!----===== Boxicons CSS ===== -->
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
     
-    <title>COOPLIGHT</title> 
+    <title>Bienvenido(a) a BRILLASIS</title> 
 </head>
 <body>
     <nav class="sidebar close">
@@ -44,8 +63,8 @@
                 </span>
 
                 <div class="text logo-text">
-                    <span class="name">COOPLIGHT</span>
-                    <span class="profession">Cooperativa Light</span>
+                    <span class="name">BRILLASIS</span>
+                    <span class="profession"></span>
                 </div>
             </div>
 
@@ -67,11 +86,17 @@
                             <span class="text nav-text">Dashboard</span>
                         </a>
                     </li>
-                    <?php if($role == 'admin' || $role == 'socio') { ?>
+                    <?php if($role == 'admin') { ?>
                     <li class="nav-link">
                         <a href="usuarios">
                             <i class='bx bx-user icon' ></i>
                             <span class="text nav-text">Usuarios</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="companies">
+                            <i class='bx bx-building-house icon'></i>
+                            <span class="text nav-text">Compañias</span>
                         </a>
                     </li>
                     <?php } ?>
@@ -79,23 +104,26 @@
                         <a href="clientes">
                             <!--Identficador del icono sacado del i: bx-bar-chart-alt-2-->
                             <i class='bx icon' ><ion-icon name="people-outline"></ion-icon></i>
-                            <span class="text nav-text">Clientes</span>
+                            <span class="text nav-text">Socios</span>
                         </a>
                     </li>
                     
+                    <?php if($role == 'admin' || $role == 'cajerop') { ?>
                     <li class="nav-link">
                         <a href="prestamos">
                             <i class='bx icon'><ion-icon name="cash-outline"></ion-icon></i>
                             <span class="text nav-text">Prestamos</span>
                         </a>
                     </li>
-
+                    <?php } ?>
+                    <?php if($role == 'admin' || $role == 'cajeroa') { ?>
                     <li class="nav-link">
                         <a href="ahorros">
                             <i class='bx icon' ><ion-icon name="wallet-outline"></ion-icon></i>
                             <span class="text nav-text">Ahorro</span>
                         </a>
                     </li>
+                    <?php } ?>
                     <!--
                     <li class="nav-link">
                         <a href="#">
@@ -142,55 +170,71 @@
     <section class="home"> 
         <br>
         <div class="text">
-            Bienvenido(a) <Strong><?php echo htmlspecialchars($_SESSION['username']); ?></Strong> a COOPLIGHT
+            <img class="imglogo" src="imgs/logo.png" alt="image logo"> Bienvenido(a) <Strong><?php echo htmlspecialchars($_SESSION['username']); ?></Strong> a BRILLASIS
         </div>
         <br>
         <!-- ======================= Cards ================== -->
         <div class="cardBox">
-            <?php if($role == 'admin' || $role == 'socio') { ?>
-            <div class="card">
-                <div>
-                    <div class="numbers"><?php echo $total; ?></div>
-                    <div class="cardName">Usuarios</div>
-                </div>
-
-                <div class="iconBx">
-                    <ion-icon name="person-circle-outline"></ion-icon>
-                </div>
-            </div>
-            <?php } ?>
-            <div class="card">
-                <div>
-                    <div class="numbers">$96,000</div>
-                    <div class="cardName">Prestado</div>
-                </div>
-
-                <div class="iconBx">
-                    <ion-icon name="card-outline"></ion-icon>
-                </div>
-            </div>
-
             <div class="card">
                 <div>
                     <div class="numbers"><?php echo $totalcli; ?></div>
-                    <div class="cardName">Clientes</div>
+                    <div class="cardName">Cantidad de empresas</div>
+                </div>
+                <div class="iconBx">
+                   <!-- <ion-icon name="pricetags-outline"></ion-icon> -->
+                   <i class='bx bx-building-house icon'></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="numbers"><?php echo "$" . number_format($total, 2, '.', ','); ?></div>
+                    <div class="cardName">Total ahorrado</div>
+                </div>
+                <div class="iconBx">
+                    <i class='bx bx-wallet'></i>
+                </div>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="numbers"><?php echo $totalp; ?></div>
+                    <div class="cardName">Total de prestamos</div>
+                </div>
+                <div class="iconBx">
+                    <ion-icon name="cash-outline"></ion-icon>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="item">
+                    <div class="number"><span class="badge"><?php echo $totalpr; ?></span></div>
+                    <div class="cardName">Cant. de prestamos</div>
+                </div>
+                <br>
+                <div class="vertical-line"></div>
+                <br>
+                <div class="item">
+                    <div class="number"><span class="badge1"><?php echo $totalpr1; ?></span></div>
+                    <div class="cardName">Cant. de prestamos</div>
                 </div>
 
+                <!-- <div class="iconBx">
+                    <ion-icon name="cash-outline"></ion-icon>
+                </div> -->
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="numbers"><?php echo $totalClientes; ?></div>
+                    <div class="cardName">Cantidad de socios</div>
+                </div>
                 <div class="iconBx">
-                    <ion-icon name="people-outline"></ion-icon>
+                   <!-- <ion-icon name="pricetags-outline"></ion-icon> -->
+                   <ion-icon name="people-outline"></ion-icon>
                 </div>
             </div>
     
-            <div class="card">
-                <div>
-                    <div class="numbers">$7,842</div>
-                    <div class="cardName">Ganancias</div>
-                </div>
-
-                <div class="iconBx">
-                    <ion-icon name="pricetags-outline"></ion-icon>
-                </div>
-            </div>
         </div>
 
         <!-- ================ Order Details List ================= -->
@@ -198,7 +242,9 @@
             <div class="recentOrders">
                 <div class="cardHeader">
                     <h2>Prestamos</h2>
-                    <a href="prestamos" class="btn">View All</a>
+                    <?php if($role == 'admin' || $role == 'cajerop') { ?>
+                      <a href="prestamos" class="btn">Ver todos</a>
+                    <?php } ?>
                 </div>
 
                 <table>
@@ -212,61 +258,27 @@
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>Star Link</td>
-                            <td>$12,100</td>
-                            <!-- <td>Due</td> -->
-                            <td><span class="status delivered">Activo</span></td>
-                        </tr>
+                        <?php
+                            require 'db.php';
+                            // Consulta con unión para obtener información del cliente
+                            $stmt = $conn->query("SELECT prestamo.id, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
+                                                FROM prestamo
+                                                JOIN cliente ON prestamo.cliente_id = cliente.id");
+                            while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $estadoClase = '';
+                                if ($prestamo['estado'] == 'activo_bien') $estadoClase = 'status delivered';
+                                elseif ($prestamo['estado'] == 'activo_problemas') $estadoClase = 'status pending';
+                                elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'status pending';
+                                elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'status return';
 
-                        <tr>
-                            <td>Delio Arts</td>
-                            <td>$11,500</td>
-                            
-                            <td><span class="status pending">Pendiente</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Apolinar Lopez</td>
-                            <td>$25,000</td>
-                            
-                            <td><span class="status return">Cancelado</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Addi Shoe</td>
-                            <td>$6,200</td>
-                            
-                            <td><span class="status delivered">Activo</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Rosa Melano</td>
-                            <td>$3,000</td>
-                           
-                            <td><span class="status delivered">Activo</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Yokito Fokito</td>
-                            <td>$8,000</td>
-                            
-                            <td><span class="status pending">Pendiente</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Alma Marcela Gozo</td>
-                            <td>$25,000</td>
-                           
-                            <td><span class="status return">Cancelado</span></td>
-                        </tr>
-
-                        <tr>
-                            <td>Armando Esteban Quito</td>
-                            <td>$10,000</td>
-                           
-                            <td><span class="status delivered">Activo</span></td>
-                        </tr>
+                                echo "<tr>";
+                                echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
+                                //echo "<td> $" . $prestamo['monto'] . "</td>";
+                                echo "<td> RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
+                                echo "<td><span class='$estadoClase'>" . ucfirst($prestamo['estado']). "</span></td>";
+                                echo "</tr>";
+                            }
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -274,7 +286,7 @@
             <!-- ================= New Customers ================ -->
             <div class="recentCustomers">
                 <div class="cardHeader">
-                    <h2>Clientes mas recientes</h2>
+                    <h2>Recientes</h2>
                 </div>
 
                 <table>

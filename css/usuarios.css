@@ -1,0 +1,25 @@
+.password-container {
+    position: relative;
+    width: 100%; /* Ajusta al tamaño deseado */
+}
+
+.password-input {
+    width: 100%;
+    padding: 10px 40px 10px 10px; /* Espaciado adicional a la derecha para el emoji */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Asegura que el padding no desborde */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px; /* Posición del emoji dentro del input */
+    top: 50%; /* Centra verticalmente */
+    transform: translateY(-50%); /* Ajuste para centrar completamente */
+    cursor: pointer;
+    font-size: 18px; /* Tamaño del emoji */
+    user-select: none; /* Evita que sea seleccionable */
+    color: #999; /* Color opcional para el emoji */
+    pointer-events: auto; /* Habilita clics en el emoji */
+}

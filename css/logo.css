@@ -1,0 +1,5 @@
+.imglogo {
+    width: 65px; /* Ancho reducido */
+    height: 65px; /* Altura reducida (igual al ancho para mantener cuadrado) */
+    object-fit: cover;  /* Asegura que la imagen se mantenga centrada y ajustada */
+}

@@ -8,7 +8,6 @@
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +16,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" href="./imgs/logo.png" type="image/x-icon">
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="css/logo.css">
+    <link rel="stylesheet" href="css/usuarios.css">
 
     <!----===== Boxicons CSS ===== -->
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
@@ -29,9 +30,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    <title>COOPLIGHT Usuarios</title> 
+    <style>
+        .dataTables_filter {
+            margin-bottom: 30px; /* Espacio entre el buscador y la tabla */
+        }
+    </style>
+
+    <title>BRILLASIS Usuarios</title> 
 </head>
-<body>
+<body style="background-color: #E4E9F7;">
     <nav class="sidebar close">
         <header>
             <div class="image-text">
@@ -40,8 +47,8 @@
                 </span>
 
                 <div class="text logo-text">
-                    <span class="name">COOPLIGHT</span>
-                    <span class="profession">Cooperativa Light</span>
+                    <span class="name">BRILLASIS</span>
+                    <span class="profession"></span>
                 </div>
             </div>
 
@@ -63,11 +70,18 @@
                             <span class="text nav-text">Dashboard</span>
                         </a>
                     </li>
-
+                   
                     <li class="nav-link">
                         <a href="#">
                             <i class='bx bx-user icon' ></i>
                             <span class="text nav-text">Usuarios</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-link">
+                        <a href="companies">
+                            <i class='bx bx-building-house icon'></i>
+                            <span class="text nav-text">Compañias</span>
                         </a>
                     </li>
 
@@ -75,7 +89,7 @@
                         <a href="clientes">
                             <!--Identficador del icono sacado del i: bx-bar-chart-alt-2-->
                             <i class='bx icon' ><ion-icon name="people-outline"></ion-icon></i>
-                            <span class="text nav-text">Clientes</span>
+                            <span class="text nav-text">Socios</span>
                         </a>
                     </li>
                     
@@ -138,12 +152,15 @@
     <section class="home"> 
         <br>
         <div class="text">
-            USUARIOS
+            <img class="imglogo" src="imgs/logo.png" alt="image logo"> USUARIOS
         </div>
         <br>
-        <div class="container mt-4">
-            <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalCrearUsuario">Agregar Usuario</button>
-            
+        <div class="card mx-auto" style="max-width: 900px; min-height: auto;">
+            <div class="card-header" style="background-color: #198754;"><h2 style="color: white;">Administración de Usuarios</h2></div>
+            <div class="card-body">
+            <br>
+            <button class="btn btn-success mb-3" data-toggle="modal" data-target="#modalCrearUsuario">Agregar Usuario</button>
+            <br><br>
             <table id="usuariosTable" class="table table-striped">
                 <thead>
                     <tr>
@@ -164,98 +181,115 @@
                             echo "<tr>";
                             echo "<td>" . htmlspecialchars($usuario['id']) . "</td>";
                             echo "<td>" . htmlspecialchars($usuario['username']) . "</td>";
-                            echo "<td>" . htmlspecialchars($usuario['role']) . "</td>";
+                            //echo "<td>" . htmlspecialchars($usuario['role']) . "</td>";
+                            if ($usuario['role'] == 'admin') {
+                                echo "<td>" . "Administrador" . "</td>";
+                            } else if($usuario['role'] == 'cajeroa') {
+                                echo "<td>" . "Cajero de Ahorros" . "</td>";
+                            } else{
+                                echo "<td>" . "Cajero de Prestamos" . "</td>";
+                            }
                             echo "<td>
-                                    <button class='btn btn-warning btn-sm' data-toggle='modal' data-target='#modalEditarUsuario' data-id='" . $usuario['id'] . "'>Editar</button>
-                                    <button class='btn btn-danger btn-sm btn-eliminar' data-id='" . $usuario['id'] . "'>Eliminar</button> 
+                                    <button class='btn btn-warning btn-sm' data-toggle='modal' data-target='#modalEditarUsuario' data-id='" . $usuario['id'] . "'><i class='bx bxs-edit'></i> Editar</button>
+                                    <button class='btn btn-danger btn-sm btn-eliminar' data-id='" . $usuario['id'] . "'><i class='bx bxs-trash'></i> Eliminar</button> 
                                 </td>";
                             echo "</tr>";
                         }
                     ?>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Modal para Agregar Usuario -->
-        <div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
+        <div class="modal fade" id="modalCrearUsuario" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="./functions/create_usuario.php" method="POST">
-                        <div class="modal-header" style="background-color: #4a57ff;">
-                            <h5 class="modal-title" id="modalCrearUsuarioLabel" style="color: white;">Agregar Usuario</h5>
-                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                    <form action="./functions/create_usuario.php" method="POST" id="Modal">
+                        <div class="modal-header" style="background-color: #198754;">
+                            <h4 class="modal-title" id="modalCrearUsuarioLabel" style="color: white;">Agregar Usuario</h4>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" onclick="Limpiar()"></button>
                         </div>
                         <div class="modal-body">
+                        <h5><u><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></u></h5>
+                        <br>
                             <div class="form-group">
-                                <label for="username">Nombre de Usuario</label>
-                                <input type="text" class="form-control" name="username" id="username" required>
+                                <label for="username">Nombre de Usuario <i class="text-danger">*</i></label>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Introduzca el usuario aquí" pattern="[A-Za-z0-9_-]" title="Solo números, letras, guiones (-) y guiones bajos (_)" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">Contraseña</label>
-                                <input type="password" class="form-control" name="password" id="password" required>
+                                <label for="password">Contraseña <i class="text-danger">*</i></label>
+                                <div class="password-container">
+                                    <input type="password" class="form-control password-input" name="password" id="password" placeholder="Introduzca la contraseña aquí" required>
+                                    <span id="toggle-password" class="password-toggle">👁️</span>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="role">Rol</label>
+                                <label for="role">Rol <i class="text-danger">*</i></label>
                                 <select class="form-control" name="role" id="role" required>
-                                    <option value="admin">admin</option>
-                                    <option value="cajero" selected>cajero</option>
-                                    <option value="socio">socio</option>
+                                    <option selected disabled value="">Seleccione una Opción</option>
+                                    <option value="admin">administrador</option>
+                                    <option value="cajeroa">cajero de ahorros</option>
+                                    <option value="cajerop">cajero de prestamos</option> 
                                     <?php
-                                    /*// Cargar los roles desde la base de datos
-                                    $roles = $conn->query("SELECT role FROM usuarios");
+                                    // Cargar los roles desde la base de datos
+                                   /* $roles = $conn->query("SELECT role FROM usuarios");
                                     while ($rol = $roles->fetch(PDO::FETCH_ASSOC)) {
-                                        echo "<option value='" /* . $rol['id'] . "'>" */ //. htmlspecialchars($rol['role']) . "</option>";
-                                    //} 
+                                        echo "<option value='" . $rol['id'] . "'>" . htmlspecialchars($rol['role']) . "</option>";
+                                    } */
                                     ?>
                                 </select>
                             </div>
                         </div>
                         <div class="modal-footer" style="background-color: #c8c8c8;">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Limpiar()">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Guardar Usuario</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Modal para Editar Usuario -->
-        <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
+        <!-- Modal para Editar Usuario || Lo que estaba en el form action="./functions/edit_usuario.php" method="POST" -->
+        <div class="modal fade" id="modalEditarUsuario" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="./functions/edit_usuario.php" method="POST">
-                        <div class="modal-header" style="background-color: #4a57ff;">
-                            <h5 class="modal-title" id="modalEditarUsuarioLabel" style="color: white;">Editar Usuario</h5>
+                    <form>
+                        <div class="modal-header" style="background-color: #198754;">
+                            <h4 class="modal-title" id="modalEditarUsuarioLabel" style="color: white;">Editar Usuario</h4>
                             <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                        <h5><u><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></u></h5>
+                        <br>
                             <input type="hidden" name="id" id="edit_id">
                             <div class="form-group">
-                                <label for="edit_username">Nombre de Usuario</label>
+                                <label for="edit_username">Nombre de Usuario <i class="text-danger">*</i></label>
                                 <input type="text" class="form-control" name="username" id="edit_username" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit_password">Contraseña (Dejar en blanco si no se quiere cambiar)</label>
-                                <input type="password" class="form-control" name="password" id="edit_password">
+                                <label for="edit_password">Contraseña <i class="text-danger">*</i> (Dejar en blanco si no se quiere cambiar)</label>
+                                <input type="password" class="form-control" name="password" id="edit_passwords">
                             </div>
                             <div class="form-group">
-                                <label for="edit_role">Rol</label>
+                                <label for="edit_role">Rol <i class="text-danger">*</i></label>
                                 <select class="form-control" name="role" id="edit_role" required>
-                                    <option value="value1">admin</option>
-                                    <option value="value2" selected>cajero</option>
-                                    <option value="value3">socio</option>
+                                    <option selected disabled value="">Seleccione una Opción</option>
+                                    <option value="admin">administrador</option>
+                                    <option value="cajeroa">cajero de ahorros</option>
+                                    <option value="cajerop">cajero de prestamos</option> 
                                 </select>
                             </div>
                         </div>
                         <div class="modal-footer" style="background-color: #c8c8c8;">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
+                            <button type="submit" class="btn btn-success">Actualizar Usuario</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
+        <br><br><br><br>
     </section>
 
     <!-- ====== Muestra el mensaje del sweetalert ======= -->
@@ -263,6 +297,8 @@
 
     <script src="js/script.js"></script>
     <script src="assets/js/main.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/keyboard.js"></script>
     <!-- ====== ionicons ======= -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -272,13 +308,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#usuariosTable').DataTable(
-                {
-                    "language":{
-                        "url":"//cdn.datatables.net/plug-ins/2.1.8/i18n/es-ES.json"
-                    }
+            $('#usuariosTable').DataTable({
+                lengthMenu: [ [5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Todos"] ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
                 }
-            );
+            });
 
             // SweetAlert para confirmar eliminación
             $('.btn-eliminar').click(function() {
@@ -303,22 +338,54 @@
     </script>
 
     <script>
-        // Cargar datos en el modal de edición cuando se hace clic en "Editar"
         $('#modalEditarUsuario').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); 
-            var id = button.data('id'); 
+            const button = $(event.relatedTarget); 
+            const id = button.data('id'); 
 
-            // Realizar una solicitud AJAX para obtener los datos del usuario
-            $.ajax({
-                url: './functions/get_usuario.php',
-                method: 'GET',
-                data: { id: id },
-                success: function(response) {
-                    var usuario = JSON.parse(response);
-                    $('#edit_username').val(usuario.username);
-                    $('#edit_password').val(usuario.password);
-                    $('#edit_role').val(usuario.role);
-                }
+            fetch('/functions/get_usuario.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const usuario = data.usuario;
+                        $('#edit_id').val(usuario.id);
+                        $('#edit_username').val(usuario.username);
+                        $('#edit_role').val(usuario.role);
+                        $('#edit_password').val(''); // Limpia el campo de contraseña
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Error', 'No se pudo obtener los datos del usuario.', 'error');
+                });
+        });
+
+
+        $(document).ready(function () {
+            // Enviar formulario de edición de usuario
+            $('#modalEditarUsuario form').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch('/functions/edit_usuario.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Éxito', data.message, 'success').then(() => {
+                                $('#modalEditarUsuario').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error');
+                    });
             });
         });
     </script>

@@ -1,0 +1,37 @@
+.badge1 {
+    display: inline-block;
+    background-color: #f1c40f; /* Color de fondo */
+    color: #000; /* Color del texto */
+    padding: 5px 10px; /* Espaciado alrededor del texto */
+    border-radius: 5px; /* Bordes redondeados */
+    font-weight: bold; /* Texto en negrita */
+    font-size: 14px; /* Tamaño de fuente */
+    text-align: center; /* Centrar el texto */
+}
+
+.badge {
+    display: inline-block;
+    background-color: #1ea529; /* Color de fondo */
+    color: #000; /* Color del texto */
+    padding: 5px 10px; /* Espaciado alrededor del texto */
+    border-radius: 5px; /* Bordes redondeados */
+    font-weight: bold; /* Texto en negrita */
+    font-size: 14px; /* Tamaño de fuente */
+    text-align: center; /* Centrar el texto */
+}
+
+.item {
+    display: flex;
+    flex: 3;
+    flex-direction: column; /* Texto encima de la cantidad */
+    align-items: center; /* Centrar los elementos */
+    text-align: center;
+}
+
+.vertical-line {
+    width: 2px; /* Ancho de la línea */
+    background-color: #a3a3a3; /* Color de la línea */
+    height: auto; /* Ajuste automático */
+    align-self: stretch; /* Ajusta la línea al tamaño del contenedor */
+}
+

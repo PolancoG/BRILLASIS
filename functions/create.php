@@ -21,6 +21,7 @@ try {
 } 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $numero_socio = $_POST['numero_socio'];
     $cedula = $_POST['cedula'];
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
@@ -30,10 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo_personal = $_POST['correo_personal'];
     $correo_institucional = $_POST['correo_institucional'];
 
-    $sql = "INSERT INTO cliente (cedula, nombre, direccion, lugar_trabajo, telefono1, telefono2, correo_personal, correo_institucional)
-            VALUES (:cedula, :nombre, :direccion, :lugar_trabajo, :telefono1, :telefono2, :correo_personal, :correo_institucional)";
+    $sql = "INSERT INTO cliente (numero_socio, cedula, nombre, direccion, lugar_trabajo, telefono1, telefono2, correo_personal, correo_institucional)
+            VALUES (:numero_socio, :cedula, :nombre, :direccion, :lugar_trabajo, :telefono1, :telefono2, :correo_personal, :correo_institucional)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([
+        ':numero_socio' => $numero_socio,
         ':cedula' => $cedula,
         ':nombre' => $nombre,
         ':direccion' => $direccion,
@@ -44,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':correo_institucional' => $correo_institucional
     ]);
     $_SESSION['mensaje'] = [
-        'texto' => 'Cliente agregado exitosamente!',
+        'texto' => 'Socio agregado exitosamente!',
         'tipo' => 'success'
     ];
     header("Location: ../clientes.php");

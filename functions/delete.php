@@ -25,7 +25,7 @@ if (isset($_GET['id'])) {
     $stmt->execute([':id' => $id]);
     
     $_SESSION['mensaje'] = [
-        'texto' => 'Cliente eliminado correctamente!',
+        'texto' => 'Socio eliminado correctamente!',
         'tipo' => 'success'
     ];
 
