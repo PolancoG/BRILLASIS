@@ -268,7 +268,7 @@
                                 <input type="text" class="form-control" name="username" id="edit_username" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit_password">Contraseña <i class="text-danger">*</i> (Dejar en blanco si no se quiere cambiar)</label>
+                                <label for="edit_password">Contraseña (Dejar en blanco si no se quiere cambiar)</label>
                                 <input type="password" class="form-control" name="password" id="edit_passwords">
                             </div>
                             <div class="form-group">
