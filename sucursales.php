@@ -242,19 +242,19 @@
                                 <h5><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></h5>
                                 <br>
                                 <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre <i class="text-danger">*</i></label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Digite el nombre" on required>
+                                    <label for="nombre" class="form-label">Nombre de la sucursal: <i class="text-danger">*</i></label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Digite el nombre de la sucursal" on required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="direccion" class="form-label">Dirección <i class="text-danger">*</i></label>
+                                    <label for="direccion" class="form-label">Dirección: <i class="text-danger">*</i></label>
                                     <textarea class="form-control" id="direccion" name="direccion" placeholder="Digite la direccion" required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="telefono" class="form-label">Teléfono <i class="text-danger">*</i></label>
+                                    <label for="telefono" class="form-label">Teléfono: <i class="text-danger">*</i></label>
                                     <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Digite el telefono" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="provincia" class="form-label">Provincia <i class="text-danger">*</i></label>
+                                    <label for="provincia" class="form-label">Provincia donde se encuentra la sucursal: <i class="text-danger">*</i></label>
                                     <select class="form-control" id="provincia" name="provincia" required>
                                         <option selected disabled value="">Seleccione una Provincia</option>
                                         <?php foreach ($provinciasRD as $provincia): ?>
@@ -263,7 +263,7 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="compania_id" class="form-label">Compañía <i class="text-danger">*</i></label>
+                                    <label for="compania_id" class="form-label">Compañía a la que pertenecerá: <i class="text-danger">*</i></label>
                                     <select class="form-control" id="compania_id" name="compania_id" required>
                                         <option selected disabled value="">Seleccione una Compañía</option>
                                         <?php
@@ -301,22 +301,22 @@
                                 <input type="hidden" id="editSucursalId" name="id">
                                 
                                 <div class="mb-3">
-                                    <label for="editSucursalNombre" class="form-label">Nombre <i class="text-danger">*</i></label>
+                                    <label for="editSucursalNombre" class="form-label">Nombre de la sucursal:<i class="text-danger">*</i></label>
                                     <input type="text" class="form-control" id="editSucursalNombre" name="nombre" required>
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="editSucursalDireccion" class="form-label">Dirección <i class="text-danger">*</i></label>
+                                    <label for="editSucursalDireccion" class="form-label">Dirección: <i class="text-danger">*</i></label>
                                     <input type="text" class="form-control" id="editSucursalDireccion" name="direccion" required>
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="editSucursalTelefono" class="form-label">Teléfono <i class="text-danger">*</i></label>
+                                    <label for="editSucursalTelefono" class="form-label">Teléfono: <i class="text-danger">*</i></label>
                                     <input type="text" class="form-control" id="editSucursalTelefono" name="telefono" required>
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="editSucursalProvincia" class="form-label">Provincia <i class="text-danger">*</i></label>
+                                    <label for="editSucursalProvincia" class="form-label">Provincia donde se encuentra la sucursal: <i class="text-danger">*</i></label>
                                     <select class="form-control" id="editSucursalProvincia" name="provincia" required>
                                         <option selected disabled value="">Seleccione una Provincia</option>
                                         <?php foreach ($provinciasRD as $provincia): ?>
@@ -326,7 +326,7 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="editSucursalCompaniaId" class="form-label">Compañía <i class="text-danger">*</i></label>
+                                    <label for="editSucursalCompaniaId" class="form-label">Compañía a la que pertenecerá: <i class="text-danger">*</i></label>
                                     <select class="form-select" id="editSucursalCompaniaId" name="compania_id" required>
                                         <!-- Opciones cargadas dinámicamente -->
                                     </select>

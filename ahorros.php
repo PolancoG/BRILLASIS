@@ -1,8 +1,4 @@
 <?php
-/* Vereificar que en el menu no esta saliendo el modulo de los ahorros al usuario correspondiente
-
-*/
-
     session_start();
 
     $role = $_SESSION['role'];
@@ -194,7 +190,8 @@
                             echo "<tr>";
                                 echo "<td>" . $ahorro['id'] . "</td>";
                                 echo "<td>" . $ahorro['cliente_nombre'] . "</td>"; // Mostrar el nombre del cliente 
-                                echo "<td>" . $ahorro['monto'] . "</td>";
+                                // echo "<td>" .  . "</td>";
+                                echo "<td> RD$" . number_format($ahorro['monto'], 2, '.', ',') . "</td>";
                                 echo "<td>" . $ahorro['fecha'] . "</td>";
                                 if($role == 'admin') { 
                                     echo "<td>
@@ -322,7 +319,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="monto">Monto Adicional <i class="text-danger">*</i></label>
+                                <label for="monto">Monto a depositar: <i class="text-danger">*</i></label>
                                 <input type="text" id="monto" name="monto" class="form-control" placeholder="Ingrese el monto adicional" onkeyPress='return isNumber(event.key);' required>
                             </div>
                         </div>

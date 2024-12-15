@@ -12,7 +12,7 @@
 
     try {
         $stmt = $conn->query("
-            SELECT c.id, c.numero_socio, c.cedula, c.nombre, 
+            SELECT c.id, c.numero_socio, c.cedula, c.nombre, c.contrato, c.image_cedula,
                    s.nombre AS sucursal_nombre, co.nombre AS compania_nombre
             FROM cliente c
             JOIN sucursal s ON c.sucursal_id = s.id
@@ -241,12 +241,18 @@
                                 <button class="btn btn-info btn-sm btnDetalle" data-id="<?php echo $c['id']; ?>"><i class='bx bx-detail'></i></button>
                                 <button class="btn btn-primary btn-sm btnEditar" data-id="<?php echo $c['id']; ?>"><i class='bx bxs-edit'></i></button>
                                 <button class="btn btn-danger btn-sm btnEliminar" data-id="<?php echo $c['id']; ?>"><i class='bx bxs-trash' ></i></button>
+                                <button class="btn btn-primary btn-sm btnVerOpciones" data-id="<?php echo $c['id']; ?>" data-cedula="<?php echo $c['image_cedula']; ?>" data-contrato="<?php echo isset($c['contrato']) ? $c['contrato'] : ''; ?>">
+                                    <i class='bx bxs-file'></i>
+                                </button>
                             </td>
                         <?php }else {?>
                             <td>
                                 <button class="btn btn-info btn-sm btnDetalle" data-id="<?php echo $c['id']; ?>"><i class='bx bx-detail'></i></button>
-                                <button class="btn btn-primary btn-sm btnEditar" data-id="<?php echo $c['id']; ?>" disabled><i class='bx bxs-edit'></i></button>
-                                <button class="btn btn-danger btn-sm btnEliminar" data-id="<?php echo $c['id']; ?>" disabled><i class='bx bxs-trash' ></i></button>
+                                <button class="btn btn-primary btn-sm btnEditar" data-id="<?php echo $c['id']; ?>" hidden><i class='bx bxs-edit'></i></button>
+                                <button class="btn btn-danger btn-sm btnEliminar" data-id="<?php echo $c['id']; ?>" hidden><i class='bx bxs-trash' ></i></button>
+                                <button class="btn btn-primary btn-sm btnVerOpciones" data-id="<?php echo $c['id']; ?>" data-cedula="<?php echo $c['image_cedula']; ?>" data-contrato="<?php echo isset($c['contrato']) ? $c['contrato'] : ''; ?>">
+                                    <i class='bx bxs-file'></i>
+                                </button>
                             </td>
                         <?php }?>
                     </tr>
@@ -342,8 +348,8 @@
                                             <input type="email" class="form-control form-control-sm" name="correo_personal" id="correo_personal" placeholder="Digite el correo personal" required>
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="correo_institucional">Correo Institucional <i class="text-danger">*</i></label>
-                                            <input type="email" class="form-control form-control-sm" name="correo_institucional" id="correo_institucional" placeholder="Digite el correo institucional" required>
+                                            <label for="correo_institucional">Correo Institucional </label>
+                                            <input type="email" class="form-control form-control-sm" name="correo_institucional" id="correo_institucional" placeholder="Digite el correo institucional">
                                         </div>
                                     </div>
 
@@ -377,10 +383,21 @@
                                             <label for="ingresos_mensuales">Ingresos Mensuales <i class="text-danger">*</i></label>
                                             <input type="text" class="form-control form-control-sm" name="ingresos_mensuales" id="ingresos_mensuales" onkeyPress='return isNumber(event.key);' placeholder="Digite los ingresos mensuales" required>
                                         </div>
+                                    </div>    
+                                    <div class="row mt-3">    
                                         <div class="form-group col-md-3">
                                             <label for="otros_ingresos">Otros Ingresos</label>
-                                            <input type="text" class="form-control form-control-sm" name="otros_ingresos" id="otros_ingresos" onkeyPress='return isNumber(event.key);' placeholder="Digite otros ingresos"> 
+                                            <input type="text" class="form-control form-control-sm" name="otros_ingresos" id="otros_ingresos" onkeyPress='return isNumber(event.key);' placeholder="Digite otros ingresos" value="0"> 
                                         </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="image_cedula">Imagen de la Cédula </label>
+                                            <input type="file" class="form-control form-control-sm" name="image_cedula" id="image_cedula" accept="image/*" >
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="contrato">Contrato </label>
+                                            <input type="file" class="form-control form-control-sm" name="contrato" id="contrato" accept=".pdf,.doc,.docx" >
+                                        </div>
+
                                     </div>
                                 </fieldset>
                             </div>
@@ -423,6 +440,14 @@
                                         <p><strong>Correo Institucional:</strong> <span id="detalle_correo_institucional"></span></p>
                                         <p><strong>Lugar de Trabajo:</strong> <span id="detalle_lugar_trabajo"></span></p>
                                     </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Sexo:</strong> <span id="detalle_sexo"></span></p>
+                                        <p><strong>Estado Civil:</strong> <span id="detalle_estado_civil"></span></p>
+                                        <p><strong>Nacionalidad:</strong> <span id="detalle_nacionalidad"></span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Descripción:</strong> <span id="detalle_descripcion"></span></p>
+                                    </div>
                                 </div>
                             </fieldset>
 
@@ -462,15 +487,15 @@
                             <fieldset class="border p-3">
                                 <legend class="w-auto px-2"><strong><u>Información Adicional</u></strong></legend>
                                 <div class="row">
-                                    <div class="col-md-4">
+                               <!--     <div class="col-md-4">
                                         <p><strong>Sexo:</strong> <span id="detalle_sexo"></span></p>
                                         <p><strong>Estado Civil:</strong> <span id="detalle_estado_civil"></span></p>
                                     </div>
                                     <div class="col-md-4">
                                         <p><strong>Nacionalidad:</strong> <span id="detalle_nacionalidad"></span></p>
                                         <p><strong>Descripción:</strong> <span id="detalle_descripcion"></span></p>
-                                    </div>
-                                </div>
+                                    </div> -->
+                                </div> 
                             </fieldset>
                         </div>
                         <div class="modal-footer">
@@ -479,6 +504,41 @@
                                 Imprimir <i class="bx bx-printer"></i>
                             </button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal "¿Qué deseas ver?" -->
+            <div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalOpcionesLabel">¿Qué deseas ver?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <button class="btn btn-secondary btnVerCedula">Ver Cédula</button>
+                            <!-- <button class="btn btn-primary btnVerContratoss"></button> -->
+                                <a href="functions/clientes/descargar_archivo.php?id=1" class="btn btn-primary">Descargar Contrato</a>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal "Cédula del Socio" -->
+            <div class="modal fade" id="modalCedula" tabindex="-1" aria-labelledby="modalCedulaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalCedulaLabel">Cédula del Socio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <!-- <img id="cedulaImagen" src="" alt="Imagen de la Cédula" class="img-fluid"> -->
+                            <img id="cedulaImagen" src="functions/clientes/mostrar_imagen.php?id=1" alt="Imagen de la Cédula" class="img-fluid">
+
                         </div>
                     </div>
                 </div>
@@ -593,6 +653,15 @@
                             Swal.fire('Error', response.error, 'error');
                         } else {
                             const c = response.cliente;
+
+                              // Formateador para moneda
+                                const formatCurrency = (value) => {
+                                    return new Intl.NumberFormat('es-DO', {
+                                        style: 'currency',
+                                        currency: 'DOP'
+                                    }).format(value);
+                                };
+
                             $('#detalle_numero_socio').text(c.numero_socio);
                             $('#detalle_cedula').text(c.cedula);
                             $('#detalle_nombre').text(c.nombre);
@@ -606,11 +675,11 @@
                             $('#detalle_nacionalidad').text(c.nacionalidad);
                             $('#detalle_lugar_trabajo').text(c.lugar_trabajo);
 
-                            $('#detalle_ingresos_mensuales').text(c.ingresos_mensuales);
-                            $('#detalle_otros_ingresos').text(c.otros_ingresos);
+                            $('#detalle_ingresos_mensuales').text(formatCurrency(c.ingresos_mensuales));
+                            $('#detalle_otros_ingresos').text(formatCurrency(c.otros_ingresos));
                             $('#detalle_descripcion').text(c.descripcion);
-                            $('#detalle_ahorros').text(response.ahorros || 0);
-                            $('#detalle_prestamos').text(response.prestamos || 0);
+                            $('#detalle_ahorros').text(formatCurrency(response.ahorros || 0));
+                            $('#detalle_prestamos').text(formatCurrency(response.prestamos || 0));
 
                             $('#detalle_sucursal').text(c.sucursal_nombre);
                             $('#detalle_compania').text(c.compania_nombre);
@@ -656,6 +725,8 @@
                             $('#ingresos_mensuales').val(c.ingresos_mensuales);
                             $('#otros_ingresos').val(c.otros_ingresos);
                             $('#descripcion').val(c.descripcion);
+                            $('#image_cedula').val(''); // Para no prellenar campos de archivo
+                            $('#contrato').val('');
 
                             $('#modalClienteLabel').text('Editar Socio');
                             $('#modalCliente').modal('show');
@@ -740,5 +811,54 @@
         });
 
     </script>
+    <script>
+    // Manejar el clic del botón "¿Qué deseas ver?"
+    $(document).on('click', '.btnVerOpciones', function () {
+        const cedula = $(this).data('cedula');
+        const contrato = $(this).data('contrato');
+
+        // Almacenar datos en los botones del modal
+        $('.btnVerCedula').data('cedula', cedula);
+        $('.btnVerContrato').data('contrato', contrato);
+
+        // Abrir modal
+        $('#modalOpciones').modal('show');
+    });
+
+    // Mostrar la cédula
+    $(document).on('click', '.btnVerCedula', function () {
+        const cedula = $(this).data('cedula');
+
+        if (cedula) {
+            $('#cedulaImagen').attr('src', '/uploads/images/' + cedula);
+            $('#modalCedula').modal('show');
+            $('#modalOpciones').modal('hide');
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No hay una cédula asociada a este cliente.',
+                showConfirmButton: false,
+                timer: 2200
+            })
+        }
+    });
+
+    // Descargar el contrato
+    $(document).on('click', '.btnVerContrato', function () {
+        const contrato = $(this).data('contrato');
+
+        if (contrato) {
+            window.location.href = '/uploads/files/' + contrato;
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No hay un contrato asociado a este cliente.',
+                showConfirmButton: false,
+                timer: 2200
+            })
+        }
+    });
+</script>
+
 </body>
 </html>

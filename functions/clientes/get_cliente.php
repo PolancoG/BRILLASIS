@@ -21,18 +21,20 @@
     $id = $_GET['id'];
 
     try {
+
         $stmt = $conn->prepare("
             SELECT 
                 c.id, c.numero_socio, c.cedula, c.nombre, c.direccion, 
                 c.lugar_trabajo, c.telefono1, c.telefono2, 
                 c.correo_personal, c.correo_institucional, c.sucursal_id, 
-                c.sexo, c.estado_civil, c.nacionalidad, 
-                c.ingresos_mensuales, c.otros_ingresos,
+                c.sexo, c.estado_civil, c.nacionalidad, c.descripcion,
+                c.ingresos_mensuales, c.otros_ingresos, c.image_cedula, c.contrato,
                 s.nombre AS sucursal_nombre
             FROM cliente c
             LEFT JOIN sucursal s ON c.sucursal_id = s.id
             WHERE c.id = :id
         ");
+
         $stmt->execute([':id' => $id]);
         $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 

@@ -257,7 +257,7 @@
                             } else {
                                 echo "<td>
                                     <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)' disabled><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' disabled><i class='bx bxs-trash'></i></button>
+                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' hidden><i class='bx bxs-trash'></i></button>
                                 </td>";
                             }
                             echo "</tr>";
