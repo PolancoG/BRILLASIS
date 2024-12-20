@@ -35,12 +35,8 @@
     $ingresos_mensuales = $_POST['ingresos_mensuales'] ?? null;
     $otros_ingresos = $_POST['otros_ingresos'] ?? null;
     $descripcion = $_POST['descripcion'] ?? null;
-    // $image_cedula = $_FILES['image_cedula']['name'] ?? null;
-    // $contrato = $_FILES['contrato']['name'] ?? null;
-    $image_cedula = null;
-    $image_cedula_type = null;
-    $contrato = null;
-    $contrato_type = null;
+    $image_cedula = $_FILES['image_cedula']['name'] ?? null;
+    $contrato = $_FILES['contrato']['name'] ?? null;
 
     // Validar campos obligatorios
     if (!$numero_socio || !$cedula || !$nombre || !$direccion || !$telefono1 || !$sexo || !$estado_civil || !$nacionalidad || !$sucursal_id) {
@@ -51,7 +47,7 @@
     try {
         if (empty($id)) {
 
-            if (!empty($_FILES['image_cedula']['tmp_name'])) {
+         /*   if (!empty($_FILES['image_cedula']['tmp_name'])) {
                 $image_cedula = file_get_contents($_FILES['image_cedula']['tmp_name']); // Leer archivo en binario
                 $image_cedula_type = $_FILES['image_cedula']['type']; // Tipo MIME
             }
@@ -59,17 +55,20 @@
             if (!empty($_FILES['contrato']['tmp_name'])) {
                 $contrato = file_get_contents($_FILES['contrato']['tmp_name']);
                 $contrato_type = $_FILES['contrato']['type'];
-            }
+            } */
 
+            //Esto lo quite de al lado de descripcion 
+            //image_cedula, image_cedula_type, contrato, contrato_type
+            //:image_cedula, :image_cedula_type, :contrato, :contrato_type
             $stmt = $conn->prepare("
                 INSERT INTO cliente (
                     numero_socio, cedula, nombre, direccion, lugar_trabajo, telefono1, telefono2, correo_personal, correo_institucional, 
-                    sucursal_id, sexo, estado_civil, nacionalidad, ingresos_mensuales, otros_ingresos, descripcion, 
-                    image_cedula, image_cedula_type, contrato, contrato_type
+                    sucursal_id, sexo, estado_civil, nacionalidad, ingresos_mensuales, otros_ingresos, descripcion
+                    
                 ) VALUES (
                     :numero_socio, :cedula, :nombre, :direccion, :lugar_trabajo, :telefono1, :telefono2, :correo_personal, :correo_institucional, 
-                    :sucursal_id, :sexo, :estado_civil, :nacionalidad, :ingresos_mensuales, :otros_ingresos, :descripcion, 
-                    :image_cedula, :image_cedula_type, :contrato, :contrato_type
+                    :sucursal_id, :sexo, :estado_civil, :nacionalidad, :ingresos_mensuales, :otros_ingresos, :descripcion
+                    
                 )
             ");
 
@@ -98,6 +97,12 @@
                 ':contrato' => $contrato
             ]); */
 
+            //Esto lo saque de mas abajo
+           /* ':image_cedula' => $image_cedula,
+                ':image_cedula_type' => $image_cedula_type,
+                ':contrato' => $contrato,
+                ':contrato_type' => $contrato_type */
+
             $stmt->execute([
                 ':numero_socio' => $numero_socio,
                 ':cedula' => $cedula,
@@ -115,10 +120,7 @@
                 ':ingresos_mensuales' => $ingresos_mensuales,
                 ':otros_ingresos' => $otros_ingresos,
                 ':descripcion' => $descripcion,
-                ':image_cedula' => $image_cedula,
-                ':image_cedula_type' => $image_cedula_type,
-                ':contrato' => $contrato,
-                ':contrato_type' => $contrato_type
+                
             ]);
             echo json_encode(['success' => true, 'message' => 'Cliente agregado exitosamente.']);
         } else {
@@ -130,8 +132,8 @@
                 ingresos_mensuales = :ingresos_mensuales, otros_ingresos = :otros_ingresos, descripcion = :descripcion
             ";
 
-            if ($image_cedula) $updateFields .= ", image_cedula = :image_cedula";
-            if ($contrato) $updateFields .= ", contrato = :contrato";
+           // if ($image_cedula) $updateFields .= ", image_cedula = :image_cedula";
+           // if ($contrato) $updateFields .= ", contrato = :contrato";
 
             $stmt = $conn->prepare("
                 UPDATE cliente SET $updateFields WHERE id = :id
@@ -156,8 +158,8 @@
                 ':id' => $id
             ];
         
-            if ($image_cedula) $params[':image_cedula'] = $image_cedula;
-            if ($contrato) $params[':contrato'] = $contrato;
+           // if ($image_cedula) $params[':image_cedula'] = $image_cedula;
+            //if ($contrato) $params[':contrato'] = $contrato;
         
             $stmt->execute($params);
         

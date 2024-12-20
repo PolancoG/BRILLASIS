@@ -34,6 +34,21 @@
     $stmt->execute([':id' => $id]);
     $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Información de ahorros
+    $stmta = $conn->prepare("SELECT SUM(monto) AS total_ahorros FROM ahorro WHERE cliente_id = :id");
+    $stmta->execute([':id' => $id]);
+    $ahorros = $stmta->fetch(PDO::FETCH_ASSOC);
+
+    // Información de préstamos
+    $stmtp = $conn->prepare("SELECT SUM(monto) AS total_prestamos FROM prestamo WHERE cliente_id = :id");
+    $stmtp->execute([':id' => $id]);
+    $prestamos = $stmtp->fetch(PDO::FETCH_ASSOC); 
+
+    $im = 'RD$'. number_format($cliente['ingresos_mensuales'], 2);
+    $oi = 'RD$' . number_format($cliente['otros_ingresos'], 2);
+    $ah = 'RD$' . number_format($ahorros['total_ahorros'] ?? 0, 2);
+    $p = 'RD$' . number_format($prestamos['total_prestamos'] ?? 0, 2);
+
     if (!$cliente) {
         die('Cliente no encontrado');
     }
@@ -106,7 +121,8 @@
     <div class="header">
         <img src="$logo" alt="Logo">
         <h1>BRILLASIS</h1>
-        <h3>Detalle del Socio: {$cliente['nombre']}</h3>
+        <h2>Informe de Socio</h2>
+        <h3>Nombre: {$cliente['nombre']}</h3>
     </div>
     
     <table  width="100%" class="table"> <!-- border="1" cellpadding="4" cellspacing="0" -->
@@ -124,8 +140,10 @@
             </td>
             <td width="55%">
                 <h2>Información Financiera:</h2><br>
-                <strong>Ingresos Mensuales:</strong> {$cliente['ingresos_mensuales']}<br>
-                <strong>Otros Ingresos:</strong> {$cliente['otros_ingresos']}<br>
+                <strong>Ingresos Mensuales:</strong> {$im}<br>
+                <strong>Otros Ingresos:</strong> {$oi}<br>
+                <strong>Total Ahorrado:</strong> {$ah}<br>
+                <strong>Prestamo:</strong> {$p}<br>
                 
                 <h2>Compañía y Sucursal:</h2><br>
                 <strong>Compañía:</strong> {$cliente['compania_nombre']}<br>

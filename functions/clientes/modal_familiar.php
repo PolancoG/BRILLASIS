@@ -14,30 +14,30 @@
 
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="cliente_id">Cliente <i class="text-danger">*</i></label>
+                            <label for="cliente_id">Socio del familiar a agregar <i class="text-danger">*</i></label>
                             <select class="form-control" name="cliente_id" id="cliente_id" required>
-                                <option value="" disabled selected>Seleccione un cliente</option>
+                                <option value="" disabled selected>Seleccione un socio</option>
                                 <?php foreach ($clientes as $cli): ?>
                                     <option value="<?php echo $cli['id']; ?>"><?php echo $cli['nombre']; ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="cedula">Cédula <i class="text-danger">*</i></label>
+                            <label for="cedula">Cédula del familiar<i class="text-danger">*</i></label>
                             <input type="text" class="form-control" name="cedula" id="cedula" placeholder="Digite la cedula" required>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="nombre">Nombre <i class="text-danger">*</i></label>
+                            <label for="nombre">Nombre del familiar<i class="text-danger">*</i></label>
                             <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Digite el nombre" onkeyPress='return onlyLtt(event.key);' required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-md-4">
-                            <label for="relacion">Relación <i class="text-danger">*</i></label>
+                            <label for="relacion">Relación con el socio<i class="text-danger">*</i></label>
                             <input type="text" class="form-control" name="relacion" id="relacion" placeholder="Digite el parentezco" onkeyPress='return onlyLtt(event.key);' required>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="telefono">Teléfono <i class="text-danger">*</i></label>
+                            <label for="telefono">Teléfono del familiar<i class="text-danger">*</i></label>
                             <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Digite el telefono" required>
                         </div>
                         <div class="form-group col-md-4">
@@ -47,7 +47,7 @@
                     </div>
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label for="nombre_hijos">Nombre de Hijos</label>
+                            <label for="nombre_hijos">Nombre de los Hijos</label>
                             <input type="text" class="form-control" name="nombre_hijos" id="nombre_hijos" placeholder="Digite el nombre de los hijos separados por coma ( , )">
                         </div>
                     </div>
