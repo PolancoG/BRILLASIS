@@ -12,7 +12,7 @@
 
     try {
         $stmt = $conn->query("
-            SELECT c.id, c.numero_socio, c.cedula, c.nombre, c.contrato, c.image_cedula,
+            SELECT c.id, c.numero_socio, c.cedula, c.nombre, c.apellido, c.contrato, c.image_cedula,
                    s.nombre AS sucursal_nombre, co.nombre AS compania_nombre
             FROM cliente c
             JOIN sucursal s ON c.sucursal_id = s.id
@@ -233,7 +233,7 @@
                         <td><?php echo $c['id']; ?></td>
                         <td><?php echo $c['numero_socio']; ?></td>
                         <td><?php echo $c['cedula']; ?></td>
-                        <td><?php echo $c['nombre']; ?></td>
+                        <td><?php echo $c['nombre']." ".$c['apellido']; ?></td>
                         <td><?php echo $c['compania_nombre']; ?></td> <!-- Dato de la compañía -->
                         <td><?php echo $c['sucursal_nombre']; ?></td>
                         <?php if($role == 'admin') { ?>
@@ -279,23 +279,31 @@
                                 <fieldset class="border p-3 mb-4">
                                     <legend class="w-auto px-2">Datos del Socio</legend>
                                     <div class="row">
-                                        <div class="form-group col-md-2">
+                                      <!--  <div class="form-group col-md-2">
                                             <label for="numero_socio">Número de Socio <i class="text-danger">*</i></label>
                                             <input type="number" class="form-control form-control-sm" name="numero_socio" id="numero_socio" placeholder="Digite el # del socio" required>
-                                        </div>
+                                        </div> 
+                                        <div class="form-group col-md-2">
+                                            <label for="numero_socio">Número de Socio <i class="text-danger">*</i></label>
+                                            <input type="text" class="form-control form-control-sm" name="numero_socio" id="numero_socio" readonly>
+                                        </div> -->
                                         <div class="form-group col-md-3">
                                             <label for="cedula">Cédula <i class="text-danger">*</i></label>
                                             <input type="text" class="form-control form-control-sm" name="cedula" id="cedula" placeholder="Digite la cedula" required>
                                         </div>
-                                        <div class="form-group col-md-4">
-                                            <label for="nombre">Nombre Completo <i class="text-danger">*</i></label>
-                                            <input type="text" class="form-control" name="nombre" id="nombre" onkeyPress='return onlyLtt(event.key);' placeholder="Digite el nombre completo" required>
+                                        <div class="form-group col-md-3">
+                                            <label for="nombre">Nombre <i class="text-danger">*</i></label>
+                                            <input type="text" class="form-control" name="nombre" id="nombre" onkeyPress='return onlyLtt(event.key);' placeholder="Digite el nombre" required>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <label for="nombre">Apellido <i class="text-danger">*</i></label>
+                                            <input type="text" class="form-control" name="apellido" id="apellido" onkeyPress='return onlyLtt(event.key);' placeholder="Digite el nombre completo" required>
                                         </div>
 
                                         <div class="form-group col-md-3">
-                                            <label for="sucursal_id">Sucursal <i class="text-danger">*</i></label>
+                                            <label for="sucursal_id">Compañia <i class="text-danger">*</i></label>
                                             <select class="form-control" name="sucursal_id" id="sucursal_id" required>
-                                                <option value="" disabled selected>Seleccione una Sucursal</option>
+                                                <option value="" disabled selected>Seleccione una Compañia</option>
                                                 <?php foreach ($sucursales as $sucursal): ?>
                                                     <option value="<?php echo $sucursal['id']; ?>"><?php echo $sucursal['nombre']; ?></option>
                                                 <?php endforeach; ?>
@@ -428,7 +436,8 @@
                                     <div class="col-md-4">
                                         <p><strong>Número de Socio:</strong> <span id="detalle_numero_socio"></span></p>
                                         <p><strong>Cédula:</strong> <span id="detalle_cedula"></span></p>
-                                        <p><strong>Nombre Completo:</strong> <span id="detalle_nombre"></span></p>
+                                        <p><strong>Nombre:</strong> <span id="detalle_nombre"></span></p>
+                                        <p><strong>Apellido:</strong> <span id="detalle_apellido"></span></p>
                                     </div>
                                     <div class="col-md-4">
                                         <p><strong>Dirección:</strong> <span id="detalle_direccion"></span></p>
@@ -582,6 +591,15 @@
             }
         });
 
+        // Obtener el número de socio generado desde el servidor mediante AJAX
+     /*   document.addEventListener("DOMContentLoaded", function() {
+            fetch('/functions/clientes/generar_numero_socio.php')
+                .then(response => response.text())
+                .then(numeroSocio => {
+                    document.getElementById('numero_socio').value = numeroSocio;
+                })
+                .catch(error => console.error('Error al generar el número de socio:', error));
+        }); */
 
         $(document).ready(function () {
                 // Inicializar DataTable sin AJAX
@@ -665,6 +683,7 @@
                             $('#detalle_numero_socio').text(c.numero_socio);
                             $('#detalle_cedula').text(c.cedula);
                             $('#detalle_nombre').text(c.nombre);
+                            $('#detalle_apellido').text(c.apellido);
                             $('#detalle_direccion').text(c.direccion);
                             $('#detalle_telefono1').text(c.telefono1);
                             $('#detalle_telefono2').text(c.telefono2);
@@ -707,6 +726,7 @@
                             $('#numero_socio').val(c.numero_socio);
                             $('#cedula').val(c.cedula);
                             $('#nombre').val(c.nombre);
+                            $('#apellido').val(c.apellido);
 
                             const direccionParts = c.direccion.split(', ');
                             $('#direccion_linea1').val(direccionParts[0] || '');

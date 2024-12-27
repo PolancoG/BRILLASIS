@@ -24,8 +24,8 @@
         // Información del cliente
         $stmt = $conn->prepare("
             SELECT 
-                c.id, c.numero_socio, c.cedula, c.nombre, c.direccion, 
-                c.lugar_trabajo, c.telefono1, c.telefono2, 
+                c.id, c.numero_socio, c.cedula, c.nombre, c.apellido, 
+                c.direccion, c.lugar_trabajo, c.telefono1, c.telefono2, 
                 c.correo_personal, c.correo_institucional, c.sucursal_id, 
                 c.sexo, c.estado_civil, c.nacionalidad, 
                 c.ingresos_mensuales, c.otros_ingresos, c.descripcion,

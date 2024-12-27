@@ -122,7 +122,7 @@
         <img src="$logo" alt="Logo">
         <h1>BRILLASIS</h1>
         <h2>Informe de Socio</h2>
-        <h3>Nombre: {$cliente['nombre']}</h3>
+        <h3>Nombre: {$cliente['nombre']} {$cliente['apellido']}</h3>
     </div>
     
     <table  width="100%" class="table"> <!-- border="1" cellpadding="4" cellspacing="0" -->
@@ -132,6 +132,7 @@
                 <strong>Número de Socio:</strong> {$cliente['numero_socio']}<br>
                 <strong>Cédula:</strong> {$cliente['cedula']}<br>
                 <strong>Nombre:</strong> {$cliente['nombre']}<br>
+                <strong>Apellido:</strong> {$cliente['apellido']}<br>
                 <strong>Dirección:</strong> {$cliente['direccion']}<br>
                 <strong>Teléfono 1:</strong> {$cliente['telefono1']}<br>
                 <strong>Teléfono 2:</strong> {$cliente['telefono2']}<br>
