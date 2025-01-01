@@ -7,6 +7,7 @@
         header("Location: index.php");
         exit();
     }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -249,17 +250,34 @@
                                 }
                                 echo "<span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) ."</span>";
                             echo "</td>";
-                            if ($role == 'admin') {
+                           /* if ($role == 'admin') {
                                 echo "<td>
+                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this'>Amortización</button>
                                     <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'><i class='bx bxs-trash'></i></button>
+                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'><i class='bx bxs-trash'></i></button>  
+
                                 </td>";
                             } else {
                                 echo "<td>
                                     <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)' disabled><i class='bx bxs-edit'></i></button>
                                     <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' hidden><i class='bx bxs-trash'></i></button>
                                 </td>";
-                            }
+                            } */
+
+                            if ($role == 'admin') {
+                                echo "<td>
+                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this)'><i class='bx bxs-user-detail'></i></button>
+                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'><i class='bx bxs-edit'></i></button>
+                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'><i class='bx bxs-trash'></i></button>
+                                </td>";
+                            } else {
+                                echo "<td>
+                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this)'><i class='bx bxs-user-detail'></i></button>
+                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)' disabled><i class='bx bxs-edit'></i></button>
+                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' hidden><i class='bx bxs-trash'></i></button>
+                                </td>";
+                            }                            
+
                             echo "</tr>";
                         }
                         ?>
@@ -549,6 +567,269 @@ function formatEstado(estado) {
             return estado.charAt(0).toUpperCase() + estado.slice(1);
     }
 }
+    </script>
+    <script>
+        function verAmortizacion(button) {
+            const prestamoId = $(button).data('id');
+
+            fetch(`/functions/get_amortizacion.php?prestamo_id=${prestamoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarModalAmortizacion(data.amortizacion);
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'No se pudo obtener la tabla de amortización.', 'error');
+                    console.error(error);
+                });
+        }
+
+       /* function mostrarModalAmortizacion(amortizacion) {
+            let tableRows = amortizacion.map(row => `
+                <tr>
+                    <td>${row.cuota}</td>
+                    <td>${row.fecha_pago}</td>
+                    <td>RD$${row.cuota_mensual}</td>
+                    <td>RD$${row.interes}</td>
+                    <td>RD$${row.capital}</td>
+                    <td>RD$${row.saldo_restante}</td>
+                </tr>
+            `).join('');
+
+            const modalHtml = `
+                <div class="modal" id="modalAmortizacion" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #198754;">
+                                <h4 class="modal-title" style="color: white">Tabla de Amortización</h4>
+                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Cuota</th>
+                                            <th>Fecha de Pago</th>
+                                            <th>Cuota Mensual</th>
+                                            <th>Interés</th>
+                                            <th>Capital</th>
+                                            <th>Saldo Restante</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#modalAmortizacion').modal('show');
+        } */
+
+        function mostrarModalAmortizacion(amortizacion, prestamoId) {
+            let tableRows = amortizacion.map(row => `
+                <tr>
+                    <td>${row.cuota_numero}</td>
+                    <td>${row.fecha_pago}</td>
+                    <td>RD$${row.monto_cuota}</td>
+                    <td>RD$${row.interes}</td>
+                    <td>RD$${row.capital}</td>
+                    <td>RD$${row.saldo_restante}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" 
+                            onclick="abrirModalPago(${prestamoId}, ${row.cuota}, ${row.saldo_restante}, ${row.monto_cuota})">
+                            Pagar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const modalHtml = `
+                <div class="modal" id="modalAmortizacion" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #198754;">
+                                <h4 class="modal-title" style="color: white">Tabla de Amortización</h4>
+                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Cuota</th>
+                                            <th>Fecha de Pago</th>
+                                            <th>Cuota Mensual</th>
+                                            <th>Interés</th>
+                                            <th>Capital</th>
+                                            <th>Saldo Restante</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${tableRows}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#modalAmortizacion').modal('show');
+        }
+
+       /* function abrirModalPago(prestamoId, cuotaNumero, saldoRestante) {
+            const modalHtml = `
+                <div class="modal" id="modalPago" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #ffc107;">
+                                <h4 class="modal-title" style="color: white">Registrar Pago</h4>
+                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="formPago">
+                                    <input type="hidden" name="prestamo_id" value="${prestamoId}">
+                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}">
+                                    <div class="mb-3">
+                                        <label for="saldoRestante" class="form-label">Saldo Restante</label>
+                                        <input type="text" id="saldoRestante" class="form-control" value="RD$${saldoRestante}" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="metodoPago" class="form-label">Método de Pago</label>
+                                        <select id="metodoPago" name="metodo_pago" class="form-select">
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="ahorro">Ahorro</option>
+                                            <option value="transferencia">Transferencia</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="montoPago" class="form-label">Monto a Pagar</label>
+                                        <input type="number" id="montoPago" name="monto_pago" class="form-control" min="1" required>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="registrarPago()">Registrar Pago</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#modalPago').modal('show');
+        }*/
+
+        function abrirModalPago(prestamoId, cuotaNumero, saldoRestante, montoCuota) {
+            console.log('montoCuota:', montoCuota); // Verifica el valor de montoCuota
+            console.log('Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero);
+
+            const modalHtml = `
+                <div class="modal" id="modalPago" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color:rgb(7, 85, 255);">
+                                <h4 class="modal-title" style="color: white">Registrar Pago</h4>
+                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="formPago">
+                                  <!--  <input type="hidden" name="prestamo_id" value="${prestamoId}">
+                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}"> -->
+                                    <input type="hidden" name="prestamo_id" id="prestamoId" value="${prestamoId}">
+                                    <input type="hidden" name="cuota_numero" id="cuotaNumero" value="${cuotaNumero}">
+                                    <div class="mb-3">
+                                        <label for="saldoRestante" class="form-label">Saldo Restante</label>
+                                        <input type="text" id="saldoRestante" class="form-control" value="RD$${saldoRestante}" disabled>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="metodoPago" class="form-label">Método de Pago</label>
+                                        <select id="metodoPago" name="metodo_pago" class="form-select">
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="ahorro">Ahorro</option>
+                                            <option value="transferencia">Transferencia</option>
+                                        </select>
+                                    </div> 
+                                    <div class="mb-3">
+                                        <label for="montoPago" class="form-label">Monto a Pagar</label>
+                                        <input type="number" id="montoPago" name="monto_pago" class="form-control" min="1" value="${montoCuota}" readonly required>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" onclick="registrarPago()">Registrar Pago</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('body').append(modalHtml);
+            $('#modalPago').modal('show');
+        }
+
+
+       /* function registrarPago() {
+            const formData = $('#formPago').serialize();
+
+            $.ajax({
+                url: '/functions/registrar_pago.php',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    const res = JSON.parse(response);
+                    Swal.fire({
+                        icon: res.success ? 'success' : 'error',
+                        title: res.success ? 'Éxito' : 'Error',
+                        text: res.message,
+                    });
+
+                    if (res.success) {
+                        $('#modalPago').modal('hide');
+                        $('#modalAmortizacion').modal('hide');
+                        // Recargar la tabla de amortización (puedes ajustar esta lógica según tu flujo)
+                        cargarAmortizacion(formData.prestamo_id);
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo procesar el pago.',
+                    });
+                }
+            });
+        } */
+
+        function registrarPago() {
+            const formData = $('#formPago').serialize();
+            console.log('FormData enviado:', formData); // Agrega esta línea para depuración.
+
+            $.ajax({
+                url: '/functions/registrar_pago.php',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    const res = JSON.parse(response);
+                    console.log('Respuesta del servidor:', res); // Agrega esta línea para ver la respuesta.
+                    Swal.fire({
+                        icon: res.success ? 'success' : 'error',
+                        title: res.success ? 'Éxito' : 'Error',
+                        text: res.message,
+                    });
+
+                    if (res.success) {
+                        $('#modalPago').modal('hide');
+                        $('#modalAmortizacion').modal('hide');
+                        cargarAmortizacion(formData.prestamo_id);
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo procesar el pago.',
+                    });
+                }
+            });
+        }
 
 
     </script>

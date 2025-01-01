@@ -66,22 +66,48 @@
                     <h5><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></h5>
                     <br>
                     <input type="hidden" id="editPrestamoId" name="id">
-                    <div class="form-group">
-                        <label>ID del Socio <i class="text-danger">*</i></label>
-                        <input type="text" id="editClienteId" class="form-control" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Monto <i class="text-danger">*</i></label>
-                        <input type="text" id="editMonto" name="monto" class="form-control" onkeyPress='return isNumber(event.key);' required>
-                    </div>
-                    <div class="form-group">
-                        <label>Interés (%) <i class="text-danger">*</i></label>
-                        <input type="text" id="editInteres" name="interes" class="form-control" onkeyPress='return isNumber(event.key);' readonly required>
-                    </div>
-                    <div class="form-group">
-                        <label>Plazo (meses) <i class="text-danger">*</i></label>
-                        <input type="text" id="editPlazo" name="plazo" class="form-control" onkeyPress='return isNumber(event.key);' required>
-                    </div>
+
+                   <?php if ($role == 'admin') { ?>
+                    
+                            <!-- Para Admin -->
+                        <div class="form-group">
+                            <label>ID del Socio <i class="text-danger">*</i></label>
+                            <input type="text" id="editClienteId" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto <i class="text-danger">*</i></label>
+                            <input type="text" id="editMonto" name="monto" class="form-control" onkeyPress='return isNumber(event.key);' required>
+                        </div>
+                        <div class="form-group">
+                            <label>Interés (%) <i class="text-danger">*</i></label>
+                            <input type="text" id="editInteres" name="interes" class="form-control" onkeyPress='return isNumber(event.key);' readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label>Plazo (meses) <i class="text-danger">*</i></label>
+                            <input type="text" id="editPlazo" name="plazo" class="form-control" onkeyPress='return isNumber(event.key);' required>
+                        </div>
+                        <!-- End para Admin-->
+
+                    <?php  } else { ?>
+                        <!-- Para demas -->
+                        <div class="form-group">
+                            <label>ID del Socio <i class="text-danger">*</i></label>
+                            <input type="text" id="editClienteId" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto <i class="text-danger">*</i></label>
+                            <input type="text" id="editMonto" name="monto" class="form-control" onkeyPress='return isNumber(event.key);' readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Interés (%) <i class="text-danger">*</i></label>
+                            <input type="text" id="editInteres" name="interes" class="form-control" onkeyPress='return isNumber(event.key);' readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Plazo (meses) <i class="text-danger">*</i></label>
+                            <input type="text" id="editPlazo" name="plazo" class="form-control" onkeyPress='return isNumber(event.key);' readonly>
+                        </div>
+                        <!-- End para demas-->
+                    <?php } ?>
                     <div class="form-group">
                         <label>Estado <i class="text-danger">*</i></label>
                         <select id="editEstado" name="estado" class="form-control" required>

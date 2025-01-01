@@ -1,0 +1,7 @@
+Array
+(
+    [prestamo_id] => undefined
+    [cuota_numero] => undefined
+    [metodo_pago] => efectivo
+    [monto_pago] => 1584.67
+)

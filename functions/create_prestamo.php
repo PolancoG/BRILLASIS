@@ -1,5 +1,5 @@
 <?php
-    session_start();
+   /* session_start();
     // Conexión a la base de datos
     $host = 'localhost';
     $dbname = 'cooplight';
@@ -12,7 +12,7 @@
     } catch (PDOException $e) {
         echo "Error de conexión: " . $e->getMessage();
         die();
-    } 
+    } */
 
    /* if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cliente_id = $_POST['cliente_id'];
@@ -112,7 +112,7 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Error al agregar el préstamo: ' . $e->getMessage()]);
 } */
-
+/*
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cliente_id = $_POST['cliente_id'] ?? null;
     $monto = $_POST['monto'] ?? null;
@@ -181,5 +181,123 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 }
+*/
+?>
 
+<?php
+    session_start();
+    // Conexión a la base de datos
+    $host = 'localhost';
+    $dbname = 'cooplight';
+    $username = 'root';
+    $password = '';
+
+    try {
+        $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        echo "Error de conexión: " . $e->getMessage();
+        die();
+    } 
+
+    require '/laragon/www/cooplight/functions/amortizacion_helper.php'; // Archivo con la función de cálculo de amortización
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $cliente_id = $_POST['cliente_id'] ?? null;
+        $monto = $_POST['monto'] ?? null;
+        $interes = $_POST['interes'] ?? null;
+        $plazo = $_POST['plazo'] ?? null;
+        $estado = $_POST['estado'] ?? null;
+
+        if (empty($cliente_id) || empty($monto) || empty($interes) || empty($plazo) || empty($estado)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Todos los campos son obligatorios.'
+            ]);
+            exit;
+        }
+
+        try {
+            // Verificar que el cliente tenga un ahorro mayor o igual a $200
+            $stmt = $conn->prepare("SELECT monto FROM ahorro WHERE cliente_id = :cliente_id AND monto >= 200");
+            $stmt->execute([':cliente_id' => $cliente_id]);
+            $ahorro = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$ahorro) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'El cliente debe tener un ahorro mayor o igual a $200 para poder registrar un préstamo.'
+                ]);
+                exit;
+            }
+
+            // Verificar si el cliente tiene préstamos pendientes
+            $stmt = $conn->prepare("SELECT * FROM prestamo WHERE cliente_id = :cliente_id AND estado != 'cancelado'");
+            $stmt->execute([':cliente_id' => $cliente_id]);
+            $prestamoExistente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($prestamoExistente) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'El cliente ya tiene un préstamo registrado.'
+                ]);
+                exit;
+            }
+
+            // Iniciar transacción
+            $conn->beginTransaction();
+
+            // Insertar el nuevo préstamo
+            $stmt = $conn->prepare("
+                INSERT INTO prestamo (cliente_id, monto, interes, plazo, estado) 
+                VALUES (:cliente_id, :monto, :interes, :plazo, :estado)
+            ");
+            $stmt->execute([
+                ':cliente_id' => $cliente_id,
+                ':monto' => $monto,
+                ':interes' => $interes,
+                ':plazo' => $plazo,
+                ':estado' => $estado
+            ]);
+            $prestamo_id = $conn->lastInsertId();
+
+            // Calcular amortización
+            $amortizacion = calcularAmortizacion($monto, $interes, $plazo);
+
+            // Guardar amortización en la tabla
+            $stmt = $conn->prepare("
+                INSERT INTO tabla_amortizacion (prestamo_id, cuota_numero, fecha_pago, monto_cuota, interes, capital, saldo_restante)
+                VALUES (:prestamo_id, :cuota_numero, :fecha_pago, :monto_cuota, :interes, :capital, :saldo_restante)
+            ");
+            foreach ($amortizacion as $cuota) {
+                $stmt->execute([
+                    ':prestamo_id' => $prestamo_id,
+                    ':cuota_numero' => $cuota['cuota'],
+                    ':fecha_pago' => $cuota['fecha_pago'],
+                    ':monto_cuota' => $cuota['cuota_mensual'],
+                    ':interes' => $cuota['interes'],
+                    ':capital' => $cuota['capital'],
+                    ':saldo_restante' => $cuota['saldo_restante']
+                ]);
+            }
+
+            // Confirmar transacción
+            $conn->commit();
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Préstamo registrado correctamente, incluyendo la tabla de amortización.'
+            ]);
+            exit;
+
+        } catch (PDOException $e) {
+            // Revertir transacción en caso de error
+            $conn->rollBack();
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al registrar el préstamo: ' . $e->getMessage()
+            ]);
+            exit;
+        }
+    }
 ?>
