@@ -649,7 +649,7 @@ function formatEstado(estado) {
             `).join('');
 
             const modalHtml = `
-                <div class="modal" id="modalAmortizacion" tabindex="-1">
+                <div class="modal" id="modalAmortizacion" tabindex="-1" data-bs-backdrop="static">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header" style="background-color: #198754;">
@@ -734,10 +734,10 @@ function formatEstado(estado) {
                             </div>
                             <div class="modal-body">
                                 <form id="formPago">
-                                  <!--  <input type="hidden" name="prestamo_id" value="${prestamoId}">
-                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}"> -->
-                                    <input type="hidden" name="prestamo_id" id="prestamoId" value="${prestamoId}">
-                                    <input type="hidden" name="cuota_numero" id="cuotaNumero" value="${cuotaNumero}">
+                                    <input type="hidden" name="prestamo_id" value="${prestamoId}">
+                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}"> 
+                                   <!--  <input type="hidden" name="prestamo_id" id="prestamoId" value="${prestamoId}">
+                                     <input type="hidden" name="cuota_numero" id="cuotaNumero" value="${cuotaNumero}"> -->
                                     <div class="mb-3">
                                         <label for="saldoRestante" class="form-label">Saldo Restante</label>
                                         <input type="text" id="saldoRestante" class="form-control" value="RD$${saldoRestante}" disabled>
