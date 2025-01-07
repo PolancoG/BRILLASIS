@@ -630,7 +630,7 @@ function formatEstado(estado) {
             $('#modalAmortizacion').modal('show');
         } */
 
-        function mostrarModalAmortizacion(amortizacion, prestamoId) {
+        function mostrarModalAmortizacion(amortizacion, prestamo_id) {
             let tableRows = amortizacion.map(row => `
                 <tr>
                     <td>${row.cuota_numero}</td>
@@ -641,9 +641,18 @@ function formatEstado(estado) {
                     <td>RD$${row.saldo_restante}</td>
                     <td>
                         <button class="btn btn-success btn-sm" 
-                            onclick="abrirModalPago(${prestamoId}, ${row.cuota}, ${row.saldo_restante}, ${row.monto_cuota})">
+                            onclick="abrirModalPago(${prestamo_id}, ${row.cuota}, ${row.saldo_restante}, ${row.monto_cuota})">
                             Pagar
                         </button>
+                    <!--    <button type="button" 
+                                class="btn btn-primary btn-pagar" 
+                                data-prestamo_id="1" 
+                                data-cuota_monto="2000" 
+                                data-toggle="modal" 
+                                data-target="#modalPagarCuota">
+                            Pagar
+                        </button> -->
+
                     </td>
                 </tr>
             `).join('');
@@ -721,8 +730,11 @@ function formatEstado(estado) {
         }*/
 
         function abrirModalPago(prestamoId, cuotaNumero, saldoRestante, montoCuota) {
-            console.log('montoCuota:', montoCuota); // Verifica el valor de montoCuota
-            console.log('Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero);
+           // console.log('montoCuota:', montoCuota); // Verifica el valor de montoCuota
+            //console.log('Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero);
+
+              // Mostrar valores en la consola para verificar
+            console.log('Abrir modal - Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero, 'Monto Cuota:', montoCuota);
 
             const modalHtml = `
                 <div class="modal" id="modalPago" tabindex="-1">
@@ -761,6 +773,7 @@ function formatEstado(estado) {
                     </div>
                 </div>
             `;
+            $('#modalPago').remove(); // Elimina cualquier modal existente antes de agregar uno nuevo
             $('body').append(modalHtml);
             $('#modalPago').modal('show');
         }
@@ -829,7 +842,7 @@ function formatEstado(estado) {
                     });
                 }
             });
-        }
+        } 
 
 
     </script>
