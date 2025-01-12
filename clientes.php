@@ -397,14 +397,14 @@
                                             <label for="otros_ingresos">Otros Ingresos</label>
                                             <input type="text" class="form-control form-control-sm" name="otros_ingresos" id="otros_ingresos" onkeyPress='return isNumber(event.key);' placeholder="Digite otros ingresos" value="0"> 
                                         </div>
-                                       <!-- <div class="form-group col-md-3">
+                                        <div class="form-group col-md-3">
                                             <label for="image_cedula">Imagen de la Cédula </label>
                                             <input type="file" class="form-control form-control-sm" name="image_cedula" id="image_cedula" accept="image/*" >
                                         </div>
                                         <div class="form-group col-md-3">
                                             <label for="contrato">Contrato </label>
                                             <input type="file" class="form-control form-control-sm" name="contrato" id="contrato" accept=".pdf,.doc,.docx" >
-                                        </div> -->
+                                        </div> 
 
                                     </div>
                                 </fieldset>

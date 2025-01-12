@@ -1,5 +1,5 @@
 <?php
-    function calcularAmortizacion($monto, $interes, $plazo) {
+    function calcularAmortizacion($monto, $interes, $plazo, $estado) {
         $cuotaMensual = ($monto * ($interes / 100) / 12) / 
             (1 - pow(1 + ($interes / 100) / 12, -$plazo));
         
@@ -17,7 +17,8 @@
                 'cuota_mensual' => round($cuotaMensual, 2),
                 'interes' => round($interesCuota, 2),
                 'capital' => round($capital, 2),
-                'saldo_restante' => round($saldo, 2)
+                'saldo_restante' => round($saldo, 2),
+                'estado' => $estado 
             ];
         }
 

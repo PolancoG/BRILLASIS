@@ -34,6 +34,12 @@
     $sqlcli = "SELECT COUNT(*) FROM cliente";
     $resultcli = $conn->query($sqlcli); //conn es el objeto conexión
     $totalClientes = $resultcli->fetchColumn();
+
+    $sqlirec = "SELECT SUM((monto * interes) / 100) AS total_intereses FROM prestamo";
+    $resultirec = $conn->query($sqlirec); //conn es el objeto conexión
+    $irec = $resultirec->fetchColumn();
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -188,7 +194,7 @@
 
             <div class="card">
                 <div>
-                    <div class="numbers"><?php echo "$" . number_format($total, 2, '.', ','); ?></div>
+                    <div class="numbers"><?php echo "RD$" . number_format($total, 2, '.', ','); ?></div>
                     <div class="cardName">Total ahorrado</div>
                 </div>
                 <div class="iconBx">
@@ -232,6 +238,17 @@
                 <div class="iconBx">
                    <!-- <ion-icon name="pricetags-outline"></ion-icon> -->
                    <ion-icon name="people-outline"></ion-icon>
+                </div>
+            </div>
+
+            <div class="card">
+                <div>
+                    <div class="numbers"><?php echo "RD$" . number_format($irec, 2, '.', ','); ?></div>
+                    <div class="cardName">IREC</div>
+                </div>
+                <div class="iconBx">
+                   <!-- <ion-icon name="pricetags-outline"></ion-icon> -->
+                   <i class='bx bx-money-withdraw'></i>
                 </div>
             </div>
     

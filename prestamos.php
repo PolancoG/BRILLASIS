@@ -203,90 +203,120 @@
                 <br><br>
 
                 <table id="tablaPrestamos" class="display table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Socio</th>
-                            <th>Monto</th>
-                            <th>Interés</th>
-                            <th>Plazo</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        require 'db.php';
-                        // Consulta con unión para obtener información del cliente
-                        $stmt = $conn->query("SELECT prestamo.id, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
-                                                FROM prestamo
-                                                JOIN cliente ON prestamo.cliente_id = cliente.id");
-                        while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $estadoClase = '';
-                            if ($prestamo['estado'] == 'activo') $estadoClase = 'status delivered';
-                            elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'status pending';
-                            elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'status return';
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Socio</th>
+            <th>Monto</th>
+            <th>Interés</th>
+            <th>Plazo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        require 'db.php';
+        // Consulta para obtener los datos de los préstamos con el cliente relacionado
+        $stmt = $conn->query("SELECT prestamo.id, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
+                            FROM prestamo
+                            JOIN cliente ON prestamo.cliente_id = cliente.id");
+        while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo "<tr>";
+            echo "<td>" . $prestamo['id'] . "</td>";
+            echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
+            echo "<td>RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
+            echo "<td>" . $prestamo['interes'] . "%</td>";
+            echo "<td>" . $prestamo['plazo'] . "</td>";
 
-                            echo "<tr>";
-                            echo "<td>" . $prestamo['id'] . "</td>";
-                            echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
-                            //echo "<td> $" . $prestamo['monto'] . "</td>";
-                            echo "<td> RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
-                            echo "<td>" . $prestamo['interes'] . "% </td>";
-                            echo "<td>" . $prestamo['plazo'] . "</td>";
+            // Estado con estilos dinámicos
+            $estadoClase = '';
+            if ($prestamo['estado'] == 'activo_bien') $estadoClase = 'bg-success';
+            elseif ($prestamo['estado'] == 'activo_problemas') $estadoClase = 'bg-warning';
+            elseif ($prestamo['estado'] == 'activo_terminado') $estadoClase = 'bg-danger';
+            elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'bg-warning';
+            elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'bg-danger';
 
-                            echo "<td>";
-                                $estadoClase = '';
-                                if ($prestamo['estado'] == 'activo_bien') {
-                                    $estadoClase = 'bg-success';
-                                } elseif ($prestamo['estado'] == 'activo_problemas') {
-                                    $estadoClase = 'bg-warning';
-                                } elseif ($prestamo['estado'] == 'activo_terminado') {
-                                    $estadoClase = 'bg-danger';
-                                } elseif ($prestamo['estado'] == 'pendiente') {
-                                    $estadoClase = 'bg-warning';
-                                } elseif ($prestamo['estado'] == 'cancelado') {
-                                    $estadoClase = 'bg-danger';
-                                }
-                                echo "<span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) ."</span>";
-                            echo "</td>";
-                           /* if ($role == 'admin') {
-                                echo "<td>
-                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this'>Amortización</button>
-                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'><i class='bx bxs-trash'></i></button>  
+            echo "<td><span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) . "</span></td>";
 
-                                </td>";
-                            } else {
-                                echo "<td>
-                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)' disabled><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' hidden><i class='bx bxs-trash'></i></button>
-                                </td>";
-                            } */
+            // Acciones con botones dinámicos
+            echo "<td>
+                <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='cargarTablaAmortizacion(" . $prestamo['id'] . ")'>
+                    <i class='bx bxs-user-detail'></i> Amortización
+                </button>
+                <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'>
+                    <i class='bx bxs-edit'></i>
+                </button>
+                <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'>
+                    <i class='bx bxs-trash'></i>
+                </button>
+            </td>";
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
 
-                            if ($role == 'admin') {
-                                echo "<td>
-                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this)'><i class='bx bxs-user-detail'></i></button>
-                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'><i class='bx bxs-trash'></i></button>
-                                </td>";
-                            } else {
-                                echo "<td>
-                                    <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='verAmortizacion(this)'><i class='bx bxs-user-detail'></i></button>
-                                    <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)' disabled><i class='bx bxs-edit'></i></button>
-                                    <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")' hidden><i class='bx bxs-trash'></i></button>
-                                </td>";
-                            }                            
 
-                            echo "</tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
+
+                
 
             </div>
         </div>
         
+        <div id="modal-amortizacion" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tabla de Amortización</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se renderizará la tabla -->
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Modal para la tabla de amortización -->
+         <!--
+<div class="modal fade" id="modalTablaAmortizacion" tabindex="-1" role="dialog" aria-labelledby="modalAmortizacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAmortizacionLabel">Tabla de Amortización</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="tablaAmortizacion" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha de Pago</th>
+                            <th>Monto Cuota</th>
+                            <th>Interés</th>
+                            <th>Capital</th>
+                            <th>Saldo Restante</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         Aquí se cargan dinámicamente las cuotas con AJAX 
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
         <!-- Modales de agregar y editar -->
         <?php include './functions/modales_prestamos.php' ?>
 
@@ -333,12 +363,22 @@
                 confirmButtonText: 'Sí, eliminarlo'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'delete_prestamo.php?id=' + id;
+                    window.location.href = '/functions/delete_prestamo.php?id=' + id;
                 }
             });
         }
-    </script>
-    <script>
+   
+        // SweetAlert para confirmar las acciones de agregar, editar y eliminar
+        <?php if (isset($_SESSION['alerta'])): ?>
+            Swal.fire({
+                icon: "<?php echo $_SESSION['alerta']['icon']; ?>",
+                title: "<?php echo $_SESSION['alerta']['title']; ?>",
+                text: "<?php echo $_SESSION['alerta']['text']; ?>",
+                showConfirmButton: false,
+                timer: 2000,
+            });
+        <?php unset($_SESSION['alerta']); endif; ?>
+
         $(document).ready(function() {
             // Cambiar el interés dinámicamente al seleccionar un cliente
             $('#cliente_id').on('change', function() {
@@ -640,10 +680,17 @@ function formatEstado(estado) {
                     <td>RD$${row.capital}</td>
                     <td>RD$${row.saldo_restante}</td>
                     <td>
+                        <button class="btn btn-primary btn-sm"> 
+                            Abonar capital
+                        </button>
+                        <button class="btn btn-warning btn-sm"> 
+                            Pagar interes
+                        </button>
                         <button class="btn btn-success btn-sm" 
                             onclick="abrirModalPago(${prestamo_id}, ${row.cuota}, ${row.saldo_restante}, ${row.monto_cuota})">
-                            Pagar
+                            Pagar cuota
                         </button>
+                        
                     <!--    <button type="button" 
                                 class="btn btn-primary btn-pagar" 
                                 data-prestamo_id="1" 
@@ -843,6 +890,386 @@ function formatEstado(estado) {
                 }
             });
         } 
+
+        function cargarTablaAmortizacion(prestamoId) {
+    $.ajax({
+        url: '/functions/cargar_amortizacion.php', // Backend para obtener la tabla de amortización
+        type: 'POST',
+        data: { prestamo_id: prestamoId },
+        success: function (response) {
+            const data = JSON.parse(response);
+            if (data.success) {
+                const tablaBody = $("#tablaAmortizacion tbody");
+                tablaBody.empty();
+                data.cuotas.forEach((cuota) => {
+                    const estadoCuota = cuota.estado_cuota === 'pagada' ? 'Pagada' : 'Pendiente';
+                    const btnAccion = cuota.estado_cuota === 'pagada'
+                        ? '<button class="btn btn-secondary btn-sm" disabled>Pagada</button>'
+                        : `<button class="btn btn-success btn-sm" onclick="pagarCuota(${prestamoId}, ${cuota.cuota_numero}, ${cuota.monto_cuota})">Pagar</button>`;
+                    
+                    const fila = `
+                        <tr>
+                            <td>${cuota.cuota_numero}</td>
+                            <td>${cuota.fecha_pago}</td>
+                            <td>RD$${cuota.monto_cuota.toFixed(2)}</td>
+                            <td>RD$${cuota.interes.toFixed(2)}</td>
+                            <td>RD$${cuota.capital.toFixed(2)}</td>
+                            <td>RD$${cuota.saldo_restante.toFixed(2)}</td>
+                            <td>${btnAccion}</td>
+                        </tr>
+                    `;
+                    tablaBody.append(fila);
+                });
+                $("#modalTablaAmortizacion").modal("show");
+            } else {
+                Swal.fire("Error", data.message, "error");
+            }
+        },
+        error: function () {
+            Swal.fire("Error", "No se pudo cargar la tabla de amortización.", "error");
+        }
+    });
+}
+
+/*function pagarCuota(prestamoId, cuotaNumero, montoCuota) {
+    Swal.fire({
+        title: 'Confirmar Pago',
+        text: `¿Desea pagar la cuota #${cuotaNumero} por RD$${montoCuota.toFixed(2)}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, pagar',
+        cancelButtonText: 'Cancelar',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/functions/pagar_cuota.php',
+                type: 'POST',
+                data: { prestamo_id: prestamoId, cuota_numero: cuotaNumero, monto_pago: montoCuota },
+                success: function (response) {
+                    const data = JSON.parse(response);
+                    if (data.success) {
+                        Swal.fire("Éxito", data.message, "success").then(() => {
+                            cargarTablaAmortizacion(prestamoId);
+                        });
+                    } else {
+                        Swal.fire("Error", data.message, "error");
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error", "No se pudo procesar el pago.", "error");
+                }
+            });
+        }
+    });
+} */
+
+$('#datatable').on('click', '.btn-amortizacion', function () {
+    const prestamoId = $(this).data('prestamo-id');
+
+    $.ajax({
+        url: '/functions/cargar_amortizacion.php',
+        type: 'POST',
+        data: { prestamo_id: prestamoId },
+        success: function (response) {
+            if (response.success) {
+                // Renderizar la tabla de cuotas con los datos recibidos
+                renderTablaAmortizacion(response.cuotas);
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo cargar la amortización.', 'error');
+        }
+    });
+});
+
+function renderTablaAmortizacion(cuotas) {
+    let html = `
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fecha de Pago</th>
+                    <th>Cuota</th>
+                    <th>Interés</th>
+                    <th>Capital</th>
+                    <th>Saldo Restante</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    cuotas.forEach(cuota => {
+        html += `
+            <tr>
+                <td>${cuota.cuota_numero}</td>
+                <td>${cuota.fecha_pago}</td>
+                <td>${cuota.monto_cuota}</td>
+                <td>${cuota.interes}</td>
+                <td>${cuota.capital}</td>
+                <td>${cuota.saldo_restante}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    $('#modal-amortizacion .modal-body').html(html);
+    $('#modal-amortizacion').modal('show');
+}
+
+/*// Función para cargar la tabla de amortización
+function cargarTablaAmortizacion(prestamoId) {
+    $.ajax({
+        url: '/functions/get_amortizacion.php', // Archivo backend para obtener datos de amortización
+        type: 'POST',
+        data: { prestamo_id: prestamoId },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                mostrarModalAmortizacion(response.data);
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo cargar la tabla de amortización.', 'error');
+        }
+    });
+} 
+
+
+// Función para mostrar la tabla de amortización en un modal
+function mostrarModalAmortizacion(amortizacion) {
+    let contenido = `
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cuota</th>
+                    <th>Fecha Pago</th>
+                    <th>Monto Cuota</th>
+                    <th>Interés</th>
+                    <th>Capital</th>
+                    <th>Saldo Restante</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    amortizacion.forEach(cuota => {
+        const estadoClase = cuota.estado === 'pagada' ? 'bg-success' : 'bg-warning';
+        const botonPagar = cuota.estado === 'pendiente' 
+            ? `<button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id})">Pagar</button>` 
+            : '';
+
+        contenido += `
+            <tr>
+                <td>${cuota.cuota_numero}</td>
+                <td>${cuota.fecha_pago}</td>
+                <td>RD$${cuota.monto_cuota}</td>
+                <td>RD$${cuota.interes}</td>
+                <td>RD$${cuota.capital}</td>
+                <td>RD$${cuota.saldo_restante}</td>
+                <td><span class="badge ${estadoClase}">${cuota.estado || 'Desconocido'}</span></td>
+                <td>${botonPagar}</td>
+            </tr>
+        `;
+    });
+
+
+    contenido += `
+            </tbody>
+        </table>
+    `;
+
+    Swal.fire({
+        title: 'Tabla de Amortización',
+        html: contenido,
+        width: '80%',
+        showCloseButton: true,
+        confirmButtonText: 'Cerrar'
+    });
+}
+
+function pagarCuota(cuotaId) {
+    // Modal con el formulario de pago
+    Swal.fire({
+        title: 'Pagar Cuota',
+        html: `
+            <form id="formPagoCuota">
+                <div class="form-group">
+                    <label for="monto_pago">Monto a Pagar</label>
+                    <input type="number" class="form-control" id="monto_pago" name="monto_pago" placeholder="Ingrese el monto" required>
+                </div>
+                <div class="form-group">
+                    <label for="metodo_pago">Método de Pago</label>
+                    <select class="form-control" id="metodo_pago" name="metodo_pago" required>
+                        <option value="efectivo">Efectivo</option>
+                        <option value="tarjeta">Tarjeta</option>
+                        <option value="transferencia">Transferencia</option>
+                    </select>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Pagar',
+        preConfirm: () => {
+            const montoPago = document.getElementById('monto_pago').value;
+            const metodoPago = document.getElementById('metodo_pago').value;
+
+            if (!montoPago || !metodoPago) {
+                Swal.showValidationMessage('Todos los campos son obligatorios');
+            }
+
+            return { monto_pago: montoPago, metodo_pago: metodoPago };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            realizarPagoCuota(cuotaId, result.value);
+        }
+    });
+}
+*/
+
+// Función para cargar la tabla de amortización
+function cargarTablaAmortizacion(prestamoId) {
+    $.ajax({
+        url: '/functions/get_amortizacion.php', // Archivo backend para obtener datos de amortización
+        type: 'POST',
+        data: { prestamo_id: prestamoId },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                // Llamar a la función mostrarModalAmortizacion con los datos obtenidos
+                mostrarModalAmortizacion(response.data);
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo cargar la tabla de amortización.', 'error');
+        }
+    });
+}
+
+// Función para mostrar la tabla de amortización en un modal
+function mostrarModalAmortizacion(amortizacion) {
+    let contenido = `
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cuota</th>
+                    <th>Fecha Pago</th>
+                    <th>Monto Cuota</th>
+                    <th>Interés</th>
+                    <th>Capital</th>
+                    <th>Saldo Restante</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    amortizacion.forEach(cuota => {
+        const estadoClase = cuota.estado === 'pagada' ? 'bg-success' : 'bg-warning';
+        const botonPagar = cuota.estado === 'pendiente' 
+            ? `<button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id})">Pagar</button>` 
+            : '';
+
+        contenido += `
+            <tr>
+                <td>${cuota.cuota_numero}</td>
+                <td>${cuota.fecha_pago}</td>
+                <td>RD$${parseFloat(cuota.monto_cuota).toFixed(2)}</td>
+                <td>RD$${parseFloat(cuota.interes).toFixed(2)}</td>
+                <td>RD$${parseFloat(cuota.capital).toFixed(2)}</td>
+                <td>RD$${parseFloat(cuota.saldo_restante).toFixed(2)}</td>
+                <td><span class="badge ${estadoClase}">${cuota.estado || 'Desconocido'}</span></td>
+                <td>${botonPagar}</td>
+            </tr>
+        `;
+    });
+
+    contenido += `
+            </tbody>
+        </table>
+    `;
+
+    Swal.fire({
+        title: 'Tabla de Amortización',
+        html: contenido,
+        width: '80%',
+        showCloseButton: true,
+        confirmButtonText: 'Cerrar'
+    });
+}
+
+// Función para manejar el pago de una cuota
+function pagarCuota(cuotaId) {
+    Swal.fire({
+        title: 'Confirmar Pago',
+        text: `¿Deseas pagar la cuota seleccionada?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Pagar',
+        cancelButtonText: 'Cancelar'
+    }).then(result => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/functions/pagar_cuota.php',
+                type: 'POST',
+                data: { cuota_id: cuotaId },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire('Éxito', 'La cuota ha sido pagada.', 'success');
+                        // Recargar la tabla de amortización
+                        cargarTablaAmortizacion(response.prestamo_id);
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
+                }
+            });
+        }
+    });
+}
+
+
+function realizarPagoCuota(cuotaId, datosPago) {
+    $.ajax({
+        url: '/functions/pagar_cuota.php', // Endpoint backend
+        type: 'POST',
+        data: { 
+            cuota_id: cuotaId, 
+            monto_pago: datosPago.monto_pago, 
+            metodo_pago: datosPago.metodo_pago 
+        },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                Swal.fire('Éxito', 'El pago se ha registrado correctamente.', 'success').then(() => {
+                    // Actualizar la tabla de amortización
+                    cargarTablaAmortizacion(response.prestamo_id);
+                });
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
+        }
+    });
+}
 
 
     </script>

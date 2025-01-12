@@ -22,8 +22,14 @@
             $stmt = $conn->prepare("DELETE FROM prestamo WHERE id = :id");
             $stmt->execute([':id' => $id]);
 
+            $_SESSION['alerta'] = [
+                'icon' => 'success',
+                'title' => 'Ahorro eliminado',
+                'text' => 'El ahorro ha sido eliminado correctamente.'
+            ];
+            
             // Redirigir con éxito
-            echo "<script>Swal.fire('Éxito', 'Préstamo eliminado correctamente.', 'success').then(() => { window.location.href = '../prestamos.php'; });</script>";
+            //echo "<script>Swal.fire('Éxito', 'Préstamo eliminado correctamente.', 'success').then(() => { window.location.href = '../prestamos.php'; });</script>";
 
         } catch (PDOException $e) {
             echo "<script>Swal.fire('Error', 'Error al eliminar el préstamo: " . $e->getMessage() . "', 'error');</script>";

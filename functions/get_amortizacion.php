@@ -1,18 +1,5 @@
 <?php
-    session_start();
-    // Conexión a la base de datos
-    $host = 'localhost';
-    $dbname = 'cooplight';
-    $username = 'root';
-    $password = '';
-
-    try {
-        $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        echo "Error de conexión: " . $e->getMessage();
-        die();
-    } 
+    /*
 
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $prestamo_id = $_GET['prestamo_id'] ?? null;
@@ -72,5 +59,60 @@
             ]);
             exit;
         }
+    } */
+?>
+
+<?php
+session_start();
+// Conexión a la base de datos
+$host = 'localhost';
+$dbname = 'cooplight';
+$username = 'root';
+$password = '';
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo "Error de conexión: " . $e->getMessage();
+    die();
+} 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $prestamo_id = $_POST['prestamo_id'] ?? null;
+
+    if (!$prestamo_id) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID de préstamo no proporcionado.'
+        ]);
+        exit;
     }
+
+    try {
+        // Obtener datos de la tabla de amortización
+        $stmt = $conn->prepare("SELECT cuota_numero, fecha_pago, monto_cuota, interes, capital, saldo_restante 
+                                FROM tabla_amortizacion 
+                                WHERE prestamo_id = :prestamo_id");
+        $stmt->execute([':prestamo_id' => $prestamo_id]);
+        $amortizacion = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($amortizacion) {
+            echo json_encode([
+                'success' => true,
+                'data' => $amortizacion
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No se encontró la tabla de amortización para este préstamo.'
+            ]);
+        }
+    } catch (PDOException $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al obtener los datos: ' . $e->getMessage()
+        ]);
+    }
+}
 ?>

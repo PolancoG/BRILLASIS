@@ -166,7 +166,7 @@
             <br>
                 <button class="btn btn-success mb-2" data-toggle="modal" data-target="#modalAgregarAhorro" >Agregar Ahorrante</button>
                 <br>
-                <button class="btn btn-secondary mb-2" data-toggle="modal" data-target="#modalAgregarMontoAhorro" >Agregar Ahorro</button>
+                <button class="btn btn-primary mb-2" data-toggle="modal" data-target="#modalAgregarMontoAhorro" >Agregar Ahorro</button>
                 <br><br>
                 <table id="tablaAhorros" class="display table table-striped table-bordered">
                     <thead>
@@ -182,10 +182,12 @@
                         <?php
                         // Modificación de la consulta para unir las tablas ahorro y cliente
                         include 'db.php';
-                        $stmt = $conn->query("SELECT ahorro.id, cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
-                                            FROM ahorro
-                                            JOIN cliente ON ahorro.cliente_id = cliente.id"
-                                        );
+                        
+                        $stmt = $conn->query("SELECT ahorro.id, ahorro.cliente_id, cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
+                                        FROM ahorro
+                                        JOIN cliente ON ahorro.cliente_id = cliente.id");
+                  
+                        
                         while ($ahorro = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             echo "<tr>";
                                 echo "<td>" . $ahorro['id'] . "</td>";
@@ -195,6 +197,7 @@
                                 echo "<td>" . $ahorro['fecha'] . "</td>";
                                 if($role == 'admin') { 
                                     echo "<td>
+                                        <button class='btn btn-primary btn-sm' data-id='" . $ahorro['id'] . "' data-cliente-id='" . $ahorro['cliente_id'] . "' onclick='retirarAhorro(this)'><i class='bx bxs-wallet'></i> Retirar</button>
                                         <button class='btn btn-warning btn-sm' data-id='" . $ahorro['id'] . "' onclick='editarAhorro(this)'><i class='bx bxs-edit'></i></button>
                                         <button class='btn btn-danger btn-sm' onclick='eliminarAhorro(" . $ahorro['id'] . ")'><i class='bx bxs-trash'></i></button>
                                     </td>";
@@ -385,6 +388,7 @@
                     Swal.fire('Error', 'El monto mínimo de ahorro debe ser $200.', 'error').then(() => location.reload());
                 }
             });
+
         });
 
         // SweetAlert para confirmar las acciones de agregar, editar y eliminar
@@ -453,6 +457,98 @@
                 });
             });
         });
+
+        /*function retirarAhorro(button) {
+                const ahorroId = button.getAttribute('data-id');
+                const clienteId = button.getAttribute('data-cliente-id');
+
+                Swal.fire({
+                    title: '¿Estas seguro que desea retirar todo el ahorro de este Socio?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Confirmar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Llamar al backend para validar y retirar el ahorro
+                        fetch('/functions/retirar_ahorro.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ ahorro_id: ahorroId, cliente_id: clienteId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Éxito',
+                                    'El ahorro ha sido retirado correctamente.',
+                                    'success'
+                                );
+                                // Recargar la tabla o realizar actualizaciones necesarias
+                                location.reload();
+                            } else {
+                                Swal.fire(
+                                    'Error',
+                                    data.message,
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire(
+                                'Error',
+                                'Ocurrió un problema al procesar la solicitud.',
+                                'error'
+                            );
+                        });
+                    }
+                });
+            }*/
+
+            function retirarAhorro(button) {
+                const ahorroId = button.getAttribute('data-id');
+                const clienteId = button.getAttribute('data-cliente-id');
+
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas retirar todo el ahorro de este Socio?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, retirar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Solicitud AJAX
+                        fetch('/functions/retirar_ahorro.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ cliente_id: clienteId, ahorro_id: ahorroId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Éxito', data.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error al intentar retirar', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Ocurrió un problema al procesar la solicitud.', 'error');
+                        });
+                    }
+                });
+            }
 
     </script>
 </body>
