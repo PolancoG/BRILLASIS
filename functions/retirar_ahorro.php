@@ -1,6 +1,6 @@
 <?php
-    /*session_start();
-    //conexion database
+/*
+    // Conexión a la base de datos
     $host = 'localhost';
     $dbname = 'cooplight';
     $username = 'root';
@@ -10,39 +10,46 @@
         $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        echo "Error de conexión: " . $e->getMessage();
-        die();
-    } 
-    $data = json_decode(file_get_contents('php://input'), true);
+        echo json_encode(['success' => false, 'message' => 'Error de conexión: ' . $e->getMessage()]);
+        exit;
+    }
 
-    $ahorro_id = $data['ahorro_id'];
-    $cliente_id = $data['cliente_id'];
+    $cliente_id = $_POST['cliente_id'] ?? null;
+    $monto = $_POST['monto'] ?? null;
 
-    // Validar si el estado del préstamo del cliente es 'activo_terminado'
-    $stmt = $conn->prepare("SELECT estado FROM prestamos WHERE cliente_id = :cliente_id ORDER BY id DESC LIMIT 1");
-    $stmt->bindParam(':cliente_id', $cliente_id);
-    $stmt->execute();
-    $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$cliente_id || !$monto) {
+        echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios.']);
+        exit;
+    }
 
-    if ($prestamo && $prestamo['estado'] === 'activo_terminado') {
-        // Proceder a retirar el ahorro
-        $stmt = $conn->prepare("DELETE FROM ahorro WHERE id = :ahorro_id");
-        $stmt->bindParam(':ahorro_id', $ahorro_id);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'No se pudo retirar el ahorro.']);
+    try {
+        // Validar que el monto a retirar no sea mayor al ahorro
+        $stmt = $conn->prepare("SELECT monto FROM ahorro WHERE cliente_id = :cliente_id");
+        $stmt->execute([':cliente_id' => $cliente_id]);
+        $ahorro = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$ahorro || $ahorro['monto'] < $monto) {
+            echo json_encode(['success' => false, 'message' => 'El monto a retirar no puede ser mayor al ahorro disponible.']);
+            exit;
         }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'El cliente tiene un préstamo en proceso.']);
-    } */
+
+        // Restar el monto al ahorro
+        $stmt = $conn->prepare("
+            UPDATE ahorro 
+            SET monto = monto - :monto, fecha_ahorro = NOW()
+            WHERE cliente_id = :cliente_id
+        ");
+        $stmt->execute([':monto' => $monto, ':cliente_id' => $cliente_id]);
+
+        echo json_encode(['success' => true, 'message' => 'Monto retirado exitosamente.']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Error al procesar el retiro: ' . $e->getMessage()]);
+    }
+        */
 ?>
 
 <?php
     session_start();
-    header('Content-Type: application/json');
-
-    //conexion database
     $host = 'localhost';
     $dbname = 'cooplight';
     $username = 'root';
@@ -52,37 +59,65 @@
         $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
-        echo "Error de conexión: " . $e->getMessage();
-        die();
-    } 
-
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    $cliente_id = $data['cliente_id'] ?? null;
-    $ahorro_id = $data['ahorro_id'] ?? null;
-
-    if (!$cliente_id || !$ahorro_id) {
-        echo json_encode(['success' => false, 'message' => 'Datos incompletos.']);
+        echo json_encode(['success' => false, 'message' => 'Error de conexión: ' . $e->getMessage()]);
         exit;
     }
 
-    // Validar el estado del préstamo
-    $stmt = $conn->prepare("SELECT estado FROM prestamo WHERE cliente_id = :cliente_id");
-    $stmt->bindParam(':cliente_id', $cliente_id);
-    $stmt->execute();
-    $estado = $stmt->fetchColumn();
+    $cliente_id = $_POST['cliente_id'] ?? null;
+    $monto = $_POST['monto'] ?? null;
+    $usuario_id = $_SESSION['user_id']; // ID del usuario logueado
 
-    if ($estado !== 'activo_terminado') {
-        echo json_encode(['success' => false, 'message' => 'El cliente tiene un préstamo en proceso o no tiene préstamo registrado.']);
+    if (!$cliente_id || !$monto) {
+        echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios.']);
         exit;
     }
 
-    // Realizar el retiro del ahorro
-    $stmt = $conn->prepare("DELETE FROM ahorro WHERE id = :ahorro_id");
-    $stmt->bindParam(':ahorro_id', $ahorro_id);
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Ahorro retirado exitosamente.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No se pudo retirar el ahorro.']);
+    try {
+        // Obtener el ahorro actual del cliente
+        $stmt = $conn->prepare("SELECT monto FROM ahorro WHERE cliente_id = :cliente_id");
+        $stmt->execute([':cliente_id' => $cliente_id]);
+        $ahorro = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$ahorro) {
+            echo json_encode(['success' => false, 'message' => 'No se encontró el ahorro del cliente.']);
+            exit;
+        }
+
+        if ($monto > $ahorro['monto']) {
+            echo json_encode(['success' => false, 'message' => 'El monto a retirar no puede ser mayor al ahorro total.']);
+            exit;
+        }
+
+        // Calcular el ahorro restante
+        $ahorro_restante = $ahorro['monto'] - $monto;
+
+        // Actualizar el monto del ahorro
+        $stmt = $conn->prepare("UPDATE ahorro SET monto = :ahorro_restante WHERE cliente_id = :cliente_id");
+        $stmt->execute([':ahorro_restante' => $ahorro_restante, ':cliente_id' => $cliente_id]);
+
+        // Generar NRC
+        $nrc = strtoupper(bin2hex(random_bytes(5))); //'NRC-' .
+
+        // Registrar el recibo
+        $stmt = $conn->prepare("
+            INSERT INTO recibos_retiros (cliente_id, usuario_id, monto_retirado, ahorro_restante, nrc)
+            VALUES (:cliente_id, :usuario_id, :monto_retirado, :ahorro_restante, :nrc)
+        ");
+        $stmt->execute([
+            ':cliente_id' => $cliente_id,
+            ':usuario_id' => $usuario_id,
+            ':monto_retirado' => $monto,
+            ':ahorro_restante' => $ahorro_restante,
+            ':nrc' => $nrc
+        ]);
+        $recibo_id = $conn->lastInsertId();
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'El retiro se realizó con éxito.',
+            'recibo_id' => $recibo_id
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Error al procesar el retiro: ' . $e->getMessage()]);
     }
 ?>

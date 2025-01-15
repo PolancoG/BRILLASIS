@@ -205,7 +205,7 @@
                 <table id="tablaPrestamos" class="display table table-striped table-bordered">
     <thead>
         <tr>
-            <th>ID</th>
+            <th># Socio</th>
             <th>Socio</th>
             <th>Monto</th>
             <th>Interés</th>
@@ -218,12 +218,12 @@
         <?php
         require 'db.php';
         // Consulta para obtener los datos de los préstamos con el cliente relacionado
-        $stmt = $conn->query("SELECT prestamo.id, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
+        $stmt = $conn->query("SELECT prestamo.id, cliente.numero_socio, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
                             FROM prestamo
                             JOIN cliente ON prestamo.cliente_id = cliente.id");
         while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<tr>";
-            echo "<td>" . $prestamo['id'] . "</td>";
+            echo "<td>" . $prestamo['numero_socio'] . "</td>";
             echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
             echo "<td>RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
             echo "<td>" . $prestamo['interes'] . "%</td>";

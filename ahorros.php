@@ -167,11 +167,14 @@
                 <button class="btn btn-success mb-2" data-toggle="modal" data-target="#modalAgregarAhorro" >Agregar Ahorrante</button>
                 <br>
                 <button class="btn btn-primary mb-2" data-toggle="modal" data-target="#modalAgregarMontoAhorro" >Agregar Ahorro</button>
-                <br><br>
+                <br>
+                <button class="btn btn-warning mb-2" data-toggle="modal" data-target="#modalRetirarAhorro">Retirar Ahorro</button>
+                <br>
+                <br>
                 <table id="tablaAhorros" class="display table table-striped table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th># Socio</th>
                             <th>Socio</th> <!-- Cambiamos el encabezado de Cliente ID a Cliente -->
                             <th>Ahorrado</th> 
                             <th>Fecha de emision</th>
@@ -183,21 +186,20 @@
                         // Modificación de la consulta para unir las tablas ahorro y cliente
                         include 'db.php';
                         
-                        $stmt = $conn->query("SELECT ahorro.id, ahorro.cliente_id, cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
+                        $stmt = $conn->query("SELECT ahorro.id, ahorro.cliente_id, cliente.numero_socio, cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
                                         FROM ahorro
                                         JOIN cliente ON ahorro.cliente_id = cliente.id");
                   
                         
                         while ($ahorro = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             echo "<tr>";
-                                echo "<td>" . $ahorro['id'] . "</td>";
+                                echo "<td>" . $ahorro['numero_socio']. "</td>";
                                 echo "<td>" . $ahorro['cliente_nombre'] . "</td>"; // Mostrar el nombre del cliente 
                                 // echo "<td>" .  . "</td>";
                                 echo "<td> RD$" . number_format($ahorro['monto'], 2, '.', ',') . "</td>";
                                 echo "<td>" . $ahorro['fecha'] . "</td>";
                                 if($role == 'admin') { 
                                     echo "<td>
-                                        <button class='btn btn-primary btn-sm' data-id='" . $ahorro['id'] . "' data-cliente-id='" . $ahorro['cliente_id'] . "' onclick='retirarAhorro(this)'><i class='bx bxs-wallet'></i> Retirar</button>
                                         <button class='btn btn-warning btn-sm' data-id='" . $ahorro['id'] . "' onclick='editarAhorro(this)'><i class='bx bxs-edit'></i></button>
                                         <button class='btn btn-danger btn-sm' onclick='eliminarAhorro(" . $ahorro['id'] . ")'><i class='bx bxs-trash'></i></button>
                                     </td>";
@@ -209,8 +211,8 @@
                                 }
                             echo "</tr>";
                         }
-                        ?>
-                    </tbody>
+                        ?>  <!--Boton antiguo de retirar ahorro-->
+                    </tbody> <!--<button class='btn btn-primary btn-sm' data-id='" . $ahorro['id'] . "' data-cliente-id='" . $ahorro['cliente_id'] . "' onclick='retirarAhorro(this)'><i class='bx bxs-wallet'></i> Retirar</button>-->
                 </table>
             </div>
         </div>
@@ -271,7 +273,7 @@
                             <br>
                             <input type="hidden" name="id" id="edit_id">
                             <div class="form-group">
-                                <label for="edit_cliente_id">ID del Socio <i class="text-danger">*</i></label>
+                                <label for="edit_cliente_id">Numero del Socio <i class="text-danger">*</i></label>
                                 <input type="number" class="form-control" name="cliente_id" id="edit_cliente_id" readonly>
                             </div>
                             <div class="form-group">
@@ -329,6 +331,54 @@
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Agregar Dinero</button>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiarFormulario()">Cerrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalRetirarAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalRetirarAhorroLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="formRetirarAhorro">
+                        <div class="modal-header" style="background-color: #ffc107; color: white;">
+                            <h4 class="modal-title" id="modalRetirarAhorroLabel">Retirar Dinero del Ahorro</h4>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" onclick="limpiarFormularioRetiro()"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></h5>
+                            <br>
+                            <div class="form-group">
+                                <label for="companiaRetiro">Compañía <i class="text-danger">*</i></label>
+                                <select id="companiaRetiro" name="compania_id" class="form-control" required>
+                                    <option value="" selected disabled>Seleccione una Compañía</option>
+                                    <?php
+                                    $stmt = $conn->query("SELECT id, nombre FROM compania");
+                                    while ($compania = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        echo "<option value='{$compania['id']}'>{$compania['nombre']}</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="clienteRetiro">Socio <i class="text-danger">*</i></label>
+                                <select id="clienteRetiro" name="cliente_id" class="form-control" required>
+                                    <option value="" selected disabled>Seleccione el socio de la compañía</option>
+                                </select>
+                            </div><br>
+                            <div class="form-group">
+                                <label for="ahorroTotal"><strong>Ahorro Total que puede retirar:</strong></label>
+                                <input type="text" id="ahorroTotal" class="form-control" disabled>
+                            </div><br>
+                            <div class="form-group">
+                                <label for="montoRetiro">Monto a retirar: <i class="text-danger">*</i></label>
+                                <input type="text" id="montoRetiro" name="monto" class="form-control" placeholder="Ingrese el monto a retirar" onkeyPress='return isNumber(event.key);' required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-warning">Retirar Dinero</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiarFormularioRetiro()">Cerrar</button>
+
                         </div>
                     </form>
                 </div>
@@ -549,6 +599,146 @@
                     }
                 });
             }
+
+    </script>
+    <script>
+
+        function limpiarFormularioRetiro() {
+            const form = document.getElementById('formRetirarAhorro');
+            form.reset(); // Limpia todos los campos del formulario
+        }
+
+        $(document).ready(function () {
+            // Cargar socios al seleccionar compañía
+            $('#companiaRetiro').on('change', function () {
+                const companiaId = $(this).val();
+                $.ajax({
+                    url: '/functions/get_socios.php',
+                    type: 'POST',
+                    data: { compania_id: companiaId },
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            const socios = data.socios;
+                            let options = '<option value="" selected disabled>Seleccione el socio</option>';
+                            socios.forEach(socio => {
+                                options += `<option value="${socio.id}" data-ahorro="${socio.ahorro}">${socio.nombre}</option>`;
+                            });
+                            $('#clienteRetiro').html(options);
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo cargar los socios.', 'error');
+                    }
+                });
+            });
+
+            // Mostrar ahorro total del socio seleccionado
+            $('#clienteRetiro').on('change', function () {
+                const ahorroTotal = $(this).find(':selected').data('ahorro');
+                //$('#ahorroTotal').val(`RD$${parseFloat(ahorroTotal).toFixed(2)}`);
+                $('#ahorroTotal').val(`RD$${parseFloat(ahorroTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+            });
+
+
+
+            // Manejar el envío del formulario de retiro
+           /* $('#formRetirarAhorro').on('submit', function (e) {
+                e.preventDefault();
+
+                const clienteId = $('#clienteRetiro').val();
+                const ahorroTotal = parseFloat($('#clienteRetiro').find(':selected').data('ahorro'));
+                const montoRetiro = parseFloat($('#montoRetiro').val());
+
+                if (montoRetiro > ahorroTotal) {
+                    Swal.fire('Error', 'El monto a retirar no puede ser mayor al ahorro total del Socio.', 'error');
+                    return;
+                }
+
+                if (montoRetiro < 100) {
+                    Swal.fire('Error', 'El monto a retirar debe ser mayor o igual a RD$100.', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/functions/retirar_ahorro.php',
+                    type: 'POST',
+                    data: { cliente_id: clienteId, monto: montoRetiro },
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            Swal.fire('Éxito', data.message, 'success').then(() => {
+                                $('#modalRetirarAhorro').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo procesar el retiro.', 'error');
+                    }
+                });
+            }); */
+
+            $('#formRetirarAhorro').on('submit', function (e) {
+                e.preventDefault();
+
+                const clienteId = $('#clienteRetiro').val();
+                const ahorroTotal = parseFloat($('#clienteRetiro').find(':selected').data('ahorro'));
+                const montoRetiro = parseFloat($('#montoRetiro').val());
+
+                if (montoRetiro > ahorroTotal) {
+                    Swal.fire('Error', 'El monto a retirar no puede ser mayor al ahorro total del Socio.', 'error');
+                    return;
+                }
+
+                if (montoRetiro < 100) {
+                    Swal.fire('Error', 'El monto a retirar debe ser mayor o igual a RD$100.', 'error');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/functions/retirar_ahorro.php',
+                    type: 'POST',
+                    data: { cliente_id: clienteId, monto: montoRetiro },
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Éxito',
+                                text: 'El retiro se realizó con éxito.',
+                                icon: 'success',
+                                showCancelButton: true,
+                                confirmButtonText: 'Imprimir Recibo',
+                                cancelButtonText: 'Cerrar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    //window.open(`/functions/imprimir_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
+                                    //window.open('/functions/generar_recibo.php', '_blank');
+                                    // Verifica que recibo_id se esté enviando correctamente
+                                    console.log(data.recibo_id);
+                                    window.open(`/functions/generar_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
+                                    //window.open(`/functions/generar_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
+                                    location.reload();
+                                } else {
+                                    location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo procesar el retiro.', 'error');
+                    }
+                });
+            });
+
+        });
+
 
     </script>
 </body>

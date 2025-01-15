@@ -14,7 +14,7 @@ function editarAhorro(button) {
           } else {
               // Llenar el formulario del modal con los datos recibidos
               $('#edit_id').val(ahorro.id);
-              $('#edit_cliente_id').val(ahorro.cliente_id);
+              $('#edit_cliente_id').val(ahorro.numero_socio);
               $('#edit_monto').val(ahorro.monto);
               $('#edit_fecha').val(ahorro.fecha);
 

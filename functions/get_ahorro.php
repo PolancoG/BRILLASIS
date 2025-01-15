@@ -19,9 +19,17 @@
 
         try {
             // Consulta para obtener los datos del ahorro y el nombre del cliente
-            $stmt = $conn->prepare("SELECT *
+          /*  $stmt = $conn->prepare("SELECT *
                                     FROM ahorro
                                     WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            $ahorro = $stmt->fetch(PDO::FETCH_ASSOC); */
+
+            // Consulta para obtener los datos del ahorro y el número de socio del cliente
+            $stmt = $conn->prepare("SELECT ahorro.*, cliente.numero_socio 
+                                    FROM ahorro
+                                    JOIN cliente ON ahorro.cliente_id = cliente.id
+                                    WHERE ahorro.id = :id");
             $stmt->execute([':id' => $id]);
             $ahorro = $stmt->fetch(PDO::FETCH_ASSOC);
 
