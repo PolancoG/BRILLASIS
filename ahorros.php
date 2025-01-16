@@ -294,6 +294,57 @@
             </div>
         </div>
 
+
+        <div class="modal fade" id="modalAgregarMontoAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalAgregarMontoAhorroLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form id="formAgregarMontoAhorro">
+                        <div class="modal-header" style="background-color: #198754; color: white;">
+                            <h4 class="modal-title" id="modalAgregarMontoAhorroLabel">Agregar Dinero al Ahorro</h4>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" onclick="limpiarFormulario()"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h5><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></h5>
+                            <br>
+                            <div class="form-group">
+                                <label for="compania">Compañía <i class="text-danger">*</i></label>
+                                <select id="compania" name="compania_id" class="form-control" required>
+                                    <option value="" selected disabled>Seleccione una Compañía</option>
+                                    <?php
+                                    $stmt = $conn->query("SELECT id, nombre FROM compania");
+                                    while ($compania = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        echo "<option value='{$compania['id']}'>{$compania['nombre']}</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cliente_id">Socio <i class="text-danger">*</i></label>
+                                <select id="cliente_id" name="cliente_id" class="form-control" required>
+                                    <option value="" selected disabled>Seleccione el socio de la compañía</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="monto">Monto a depositar: <i class="text-danger">*</i></label>
+                                <input type="text" id="monto" name="monto" class="form-control" placeholder="Ingrese el monto adicional" onkeypress="return isNumber(event.key);" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comentario">Comentario (opcional):</label>
+                                <textarea id="comentario" name="comentario" class="form-control" placeholder="Escriba un comentario si es necesario"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Agregar Dinero</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiarFormulario()">Cerrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!--
         <div class="modal fade" id="modalAgregarMontoAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalAgregarMontoAhorroLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -336,6 +387,7 @@
                 </div>
             </div>
         </div>
+                                -->
 
         <div class="modal fade" id="modalRetirarAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalRetirarAhorroLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -453,6 +505,61 @@
         <?php unset($_SESSION['alerta']); endif; ?>
     </script>
     <script>
+      /*  $(document).ready(function () {
+            // Cargar clientes al seleccionar una compañía
+            $('#compania').on('change', function () {
+                const companiaId = $(this).val();
+
+                if (companiaId) {
+                    $.ajax({
+                        url: '/functions/get_clientes_por_compania.php',
+                        type: 'GET',
+                        data: { compania_id: companiaId },
+                        success: function (response) {
+                            const clientes = JSON.parse(response);
+                            const clienteSelect = $('#cliente_id');
+                            clienteSelect.empty().append('<option value="" selected disabled>Seleccione el socio</option>');
+                            clientes.forEach(cliente => {
+                                clienteSelect.append(`<option value="${cliente.id}">${cliente.nombre}</option>`);
+                            });
+                        },
+                        error: function () {
+                            Swal.fire('Error', 'No se pudo cargar los clientes de la compañía.', 'error');
+                        }
+                    });
+                }
+            });
+
+            // Manejar el envío del formulario
+            $('#formAgregarMontoAhorro').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                $.ajax({
+                    url: '/functions/agregar_monto_ahorro.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            Swal.fire('Éxito', data.message, 'success').then(() => {
+                                $('#modalAgregarMontoAhorro').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo agregar el monto al ahorro.', 'error');
+                    }
+                });
+            });
+        }); */
+
         $(document).ready(function () {
             // Cargar clientes al seleccionar una compañía
             $('#compania').on('change', function () {
@@ -508,56 +615,7 @@
             });
         });
 
-        /*function retirarAhorro(button) {
-                const ahorroId = button.getAttribute('data-id');
-                const clienteId = button.getAttribute('data-cliente-id');
 
-                Swal.fire({
-                    title: '¿Estas seguro que desea retirar todo el ahorro de este Socio?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Confirmar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Llamar al backend para validar y retirar el ahorro
-                        fetch('/functions/retirar_ahorro.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ ahorro_id: ahorroId, cliente_id: clienteId })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Éxito',
-                                    'El ahorro ha sido retirado correctamente.',
-                                    'success'
-                                );
-                                // Recargar la tabla o realizar actualizaciones necesarias
-                                location.reload();
-                            } else {
-                                Swal.fire(
-                                    'Error',
-                                    data.message,
-                                    'error'
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire(
-                                'Error',
-                                'Ocurrió un problema al procesar la solicitud.',
-                                'error'
-                            );
-                        });
-                    }
-                });
-            }*/
 
             function retirarAhorro(button) {
                 const ahorroId = button.getAttribute('data-id');
@@ -642,47 +700,7 @@
                 $('#ahorroTotal').val(`RD$${parseFloat(ahorroTotal).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
             });
 
-
-
             // Manejar el envío del formulario de retiro
-           /* $('#formRetirarAhorro').on('submit', function (e) {
-                e.preventDefault();
-
-                const clienteId = $('#clienteRetiro').val();
-                const ahorroTotal = parseFloat($('#clienteRetiro').find(':selected').data('ahorro'));
-                const montoRetiro = parseFloat($('#montoRetiro').val());
-
-                if (montoRetiro > ahorroTotal) {
-                    Swal.fire('Error', 'El monto a retirar no puede ser mayor al ahorro total del Socio.', 'error');
-                    return;
-                }
-
-                if (montoRetiro < 100) {
-                    Swal.fire('Error', 'El monto a retirar debe ser mayor o igual a RD$100.', 'error');
-                    return;
-                }
-
-                $.ajax({
-                    url: '/functions/retirar_ahorro.php',
-                    type: 'POST',
-                    data: { cliente_id: clienteId, monto: montoRetiro },
-                    success: function (response) {
-                        const data = JSON.parse(response);
-                        if (data.success) {
-                            Swal.fire('Éxito', data.message, 'success').then(() => {
-                                $('#modalRetirarAhorro').modal('hide');
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire('Error', data.message, 'error');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('Error', 'No se pudo procesar el retiro.', 'error');
-                    }
-                });
-            }); */
-
             $('#formRetirarAhorro').on('submit', function (e) {
                 e.preventDefault();
 
@@ -716,12 +734,7 @@
                                 cancelButtonText: 'Cerrar'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    //window.open(`/functions/imprimir_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
-                                    //window.open('/functions/generar_recibo.php', '_blank');
-                                    // Verifica que recibo_id se esté enviando correctamente
-                                    console.log(data.recibo_id);
                                     window.open(`/functions/generar_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
-                                    //window.open(`/functions/generar_recibo.php?recibo_id=${data.recibo_id}`, '_blank');
                                     location.reload();
                                 } else {
                                     location.reload();

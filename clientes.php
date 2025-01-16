@@ -402,7 +402,7 @@
                                             <input type="file" class="form-control form-control-sm" name="image_cedula" id="image_cedula" accept="image/*" >
                                         </div>
                                         <div class="form-group col-md-3">
-                                            <label for="contrato">Contrato </label>
+                                            <label for="contrato">Formulario </label>
                                             <input type="file" class="form-control form-control-sm" name="contrato" id="contrato" accept=".pdf,.doc,.docx" >
                                         </div> 
 
@@ -519,39 +519,36 @@
             </div>
 
             <!-- Modal "¿Qué deseas ver?" -->
-            <div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalOpcionesLabel">¿Qué deseas ver?</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <button class="btn btn-secondary btnVerCedula">Ver Cédula</button>
-                            <!-- <button class="btn btn-primary btnVerContratoss"></button> -->
-                                <a href="functions/clientes/descargar_archivo.php?id=1" class="btn btn-primary">Descargar Contrato</a>
-                            
-                        </div>
-                    </div>
-                </div>
+<div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalOpcionesLabel">¿Qué deseas ver?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <!-- Modal "Cédula del Socio" -->
-            <div class="modal fade" id="modalCedula" tabindex="-1" aria-labelledby="modalCedulaLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalCedulaLabel">Cédula del Socio</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                            <!-- <img id="cedulaImagen" src="" alt="Imagen de la Cédula" class="img-fluid"> -->
-                            <img id="cedulaImagen" src="functions/clientes/mostrar_imagen.php?id=1" alt="Imagen de la Cédula" class="img-fluid">
-
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-body text-center">
+                <button class="btn btn-secondary btnVerCedula">Ver Cédula</button>
+                <button class="btn btn-primary btnVerContrato">Descargar Contrato</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal "Cédula del Socio" -->
+<div class="modal fade" id="modalCedula" tabindex="-1" aria-labelledby="modalCedulaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCedulaLabel">Cédula del Socio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="cedulaImagen" src="" alt="Imagen de la Cédula" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
 
             <!-- End clientes -->
             </div>
@@ -833,7 +830,7 @@
     </script>
     <script>
     // Manejar el clic del botón "¿Qué deseas ver?"
-    $(document).on('click', '.btnVerOpciones', function () {
+   /* $(document).on('click', '.btnVerOpciones', function () {
         const cedula = $(this).data('cedula');
         const contrato = $(this).data('contrato');
 
@@ -877,8 +874,56 @@
                 timer: 2200
             })
         }
-    });
-</script>
+    }); */
+
+        $(document).on('click', '.btnVerOpciones', function () {
+            const clienteId = $(this).data('id');
+            const cedula = $(this).data('cedula');
+            const contrato = $(this).data('contrato');
+
+            $('.btnVerCedula').data('cedula', cedula);
+            $('.btnVerCedula').data('id', clienteId);
+            $('.btnVerContrato').data('contrato', contrato);
+            $('.btnVerContrato').data('id', clienteId);
+
+            $('#modalOpciones').modal('show');
+        });
+
+        // Mostrar la cédula
+        $(document).on('click', '.btnVerCedula', function () {
+            const clienteId = $(this).data('id');
+            if (clienteId) {
+                const imgPath = `/functions/uploads/cedulas/${clienteId}`;
+                $('#cedulaImagen').attr('src', imgPath);
+                $('#modalCedula').modal('show');
+                $('#modalOpciones').modal('hide');
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No hay una cédula asociada a este cliente.',
+                    showConfirmButton: false,
+                    timer: 2200,
+                });
+            }
+        }); 
+
+        // Descargar el contrato
+        $(document).on('click', '.btnVerContrato', function () {
+            const clienteId = $(this).data('id');
+            if (clienteId) {
+                const contractPath = `/functions/uploads/contratos/${clienteId}`;
+                window.location.href = contractPath;
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No hay un contrato asociado a este cliente.',
+                    showConfirmButton: false,
+                    timer: 2200,
+                });
+            }
+        });
+
+    </script>
 
 </body>
 </html>
