@@ -13,7 +13,7 @@
     try {
         $stmt = $conn->query("
             SELECT c.id, c.numero_socio, c.cedula, c.nombre, c.apellido, c.contrato, c.image_cedula,
-                   s.nombre AS sucursal_nombre, co.nombre AS compania_nombre
+                   c.estado, s.nombre AS sucursal_nombre, co.nombre AS compania_nombre
             FROM cliente c
             JOIN sucursal s ON c.sucursal_id = s.id
             JOIN compania co ON s.compania_id = co.id
@@ -76,6 +76,24 @@
         .dataTables_filter {
             margin-bottom: 30px; /* Espacio entre el buscador y la tabla */
         }
+    </style>
+    <style>
+     .badge {
+        padding: 0.5em 0.8em;
+        font-size: 0.9em;
+        border-radius: 0.5rem;
+        color: #fff;
+        display: inline-block;
+        width: fit-content;
+    }
+
+    .bg-success {
+        background-color: #28a745; /* Verde */
+    }
+
+    .bg-danger {
+        background-color: #dc3545; /* Rojo */
+    }
     </style>
 
     <title>BRILLASIS Socios</title> 
@@ -218,24 +236,33 @@
             <table id="tablaClientes" class="table table-hover table-bordered" style="width:100%;">
                 <thead class="thead-light">
                 <tr>
-                    <th>ID</th>
-                    <th>Número de Socio</th>
+                    <th># Socio</th>
                     <th>Cédula</th>
                     <th>Nombre</th>
                     <th>Compañia</th>
                     <th>Sucursal</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php foreach ($clientes as $c): ?>
                     <tr>
-                        <td><?php echo $c['id']; ?></td>
                         <td><?php echo $c['numero_socio']; ?></td>
                         <td><?php echo $c['cedula']; ?></td>
                         <td><?php echo $c['nombre']." ".$c['apellido']; ?></td>
                         <td><?php echo $c['compania_nombre']; ?></td> <!-- Dato de la compañía -->
                         <td><?php echo $c['sucursal_nombre']; ?></td>
+                        
+                        <?php 
+                            // Estado con estilos dinámicos
+                            $estadoClase = '';
+                                if ($c['estado'] == 'activo') $estadoClase = 'bg-success';
+                                elseif ($c['estado'] == 'inactivo') $estadoClase = 'bg-danger'; 
+                        ?>
+                       <?php echo "<td><span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $c['estado'])) . "</span></td>"; ?>
+                        <!-- <td><span class='badge $estadoClase'><?php echo $c['estado']; ?></span></td> -->
+                       <!-- <td>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) . "</td> -->
                         <?php if($role == 'admin') { ?>
                             <td>
                                 <button class="btn btn-info btn-sm btnDetalle" data-id="<?php echo $c['id']; ?>"><i class='bx bx-detail'></i></button>
@@ -406,6 +433,16 @@
                                             <input type="file" class="form-control form-control-sm" name="contrato" id="contrato" accept=".pdf,.doc,.docx" >
                                         </div> 
 
+                                    </div>
+                                    <div class="row mt-3" id="estadoRow" style="display: none;">
+                                        <div class="form-group col-md-3">
+                                            <label for="estado">Estado</label>
+                                            <select class="form-control" name="estado" id="estado">
+                                                <option value="" disabled selected>Seleccione un estado</option>
+                                                <option value="activo">Activo</option>
+                                                <option value="inactivo">Inactivo</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </fieldset>
                             </div>
@@ -588,6 +625,26 @@
             }
         });
 
+        document.getElementById('formCliente').addEventListener('submit', function (e) {
+            const cedulaFile = document.getElementById('image_cedula').files[0];
+            const contratoFile = document.getElementById('contrato').files[0];
+            const maxFileSize = 1048576; // 1MB en bytes
+
+            // Validar archivo de cédula
+            if (cedulaFile && cedulaFile.size > maxFileSize) {
+                Swal.fire('Error', 'La imagen de la cédula no debe exceder 1MB.', 'error');
+                e.preventDefault(); // Evitar el envío del formulario
+                return;
+            }
+
+            // Validar archivo de contrato
+            if (contratoFile && contratoFile.size > maxFileSize) {
+                Swal.fire('Error', 'El contrato no debe exceder 1MB.', 'error');
+                e.preventDefault(); // Evitar el envío del formulario
+                return;
+            }
+        });
+
         // Obtener el número de socio generado desde el servidor mediante AJAX
      /*   document.addEventListener("DOMContentLoaded", function() {
             fetch('/functions/clientes/generar_numero_socio.php')
@@ -745,6 +802,10 @@
                             $('#image_cedula').val(''); // Para no prellenar campos de archivo
                             $('#contrato').val('');
 
+                            // Mostrar y establecer el valor del campo estado
+                            $('#estado').val(c.estado || 'activo');
+                            $('#estadoRow').show();
+
                             $('#modalClienteLabel').text('Editar Socio');
                             $('#modalCliente').modal('show');
                         }
@@ -875,6 +936,7 @@
             })
         }
     }); */
+
 
         $(document).on('click', '.btnVerOpciones', function () {
             const clienteId = $(this).data('id');

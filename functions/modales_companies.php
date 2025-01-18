@@ -80,6 +80,15 @@
                                 <label for="editarCorreo">Interes Fijo <i class="text-danger">*</i></label>
                                 <input type="number" class="form-control" id="editarInteresFijo" name="interes_fijo" onkeyPress='return isNumber(event.key);' required>
                             </div>
+                            <div class="form-group">
+                                <label for="editarEstado">Estado</label>
+                                <select class="form-control" id="editarEstado" name="estado">
+                                    <option value="" disabled selected>Seleccione un estado</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

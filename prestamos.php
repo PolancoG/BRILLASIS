@@ -241,9 +241,7 @@
 
             // Acciones con botones dinámicos
             echo "<td>
-                <button class='btn btn-info btn-sm' data-id='" . $prestamo['id'] . "' onclick='cargarTablaAmortizacion(" . $prestamo['id'] . ")'>
-                    <i class='bx bxs-user-detail'></i> Amortización
-                </button>
+                <button class='btn btn-primary btn-sm btnAmortizacion' data-prestamo-id='{$prestamo['id']}'><i class='bx bxs-user-detail'></i></button>
                 <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'>
                     <i class='bx bxs-edit'></i>
                 </button>
@@ -263,59 +261,105 @@
 
             </div>
         </div>
-        
-        <div id="modal-amortizacion" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    
+
+        <div class="modal fade" id="modalAmortizacion" tabindex="-1" aria-labelledby="modalAmortizacionLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl"> <!-- Cambiado a modal-xl para mayor ancho -->
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #198754;">
+                        <h4 class="modal-title" id="modalAmortizacionLabel" style="color: white">Tabla de Amortización</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="tablaAmortizacionContainer" class="table-responsive">
+                            <!-- Aquí se inyectará la tabla de amortización dinámicamente -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Modal para Pago de Cuota -->
+<div class="modal fade" id="modalPagarCuota" tabindex="-1" role="dialog" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tabla de Amortización</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="modalPagarCuotaLabel">Pagar Cuota</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="limpiarForm()"></button>
             </div>
             <div class="modal-body">
-                <!-- Aquí se renderizará la tabla -->
+                <form id="formPagarCuota">
+                    <input type="hidden" id="cuotaId" name="cuota_id">
+
+                    <div class="row">
+                        <!-- Monto del Préstamo -->
+                        <div class="form-group col-md-6">
+                            <label for="montoPrestamo">Monto Total del Préstamo</label>
+                            <input type="text" class="form-control" id="montoPrestamo" readonly>
+                        </div>
+
+                        <!-- Monto de la Cuota -->
+                        <div class="form-group col-md-6">
+                            <label for="montoCuota">Monto de la Cuota</label>
+                            <input type="text" class="form-control" id="montoCuota" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- Método de Pago -->
+                        <div class="form-group col-md-6">
+                            <label for="metodoPago">Método de Pago</label>
+                            <select class="form-control" id="metodoPago" name="metodo_pago" required>
+                                <option value="" disabled selected>Seleccione un método</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="ahorro">Ahorro</option>
+                            </select>
+                        </div>
+
+                        <!-- Saldo de Ahorro -->
+                        <div class="form-group col-md-6" id="saldoAhorroContainer" style="display: none;">
+                            <label for="saldoAhorro">Saldo Actual de Ahorro</label>
+                            <input type="text" class="form-control" id="saldoAhorro" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="limpiarForm()">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="procesarPagoCuota()">Pagar</button>
             </div>
         </div>
     </div>
 </div>
 
-        <!-- Modal para la tabla de amortización -->
-         <!--
-<div class="modal fade" id="modalTablaAmortizacion" tabindex="-1" role="dialog" aria-labelledby="modalAmortizacionLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalAmortizacionLabel">Tabla de Amortización</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+
+
+        <!--<div class="modal fade" id="modalPagarCuota" tabindex="-1" role="dialog" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalPagarCuotaLabel">Pagar Cuota</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formPagarCuota">
+                            <input type="hidden" id="cuotaId">
+                            <div class="form-group">
+                                <label for="montoPago">Monto a Pagar</label>
+                                <input type="text" class="form-control" id="montoPago" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="procesarPago()">Pagar</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <table id="tablaAmortizacion" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Fecha de Pago</th>
-                            <th>Monto Cuota</th>
-                            <th>Interés</th>
-                            <th>Capital</th>
-                            <th>Saldo Restante</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         Aquí se cargan dinámicamente las cuotas con AJAX 
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
--->
+        </div> -->
+
 
         <!-- Modales de agregar y editar -->
         <?php include './functions/modales_prestamos.php' ?>
@@ -337,6 +381,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <script>
+        function limpiarForm() {
+            const form = document.getElementById('formPagarCuota');
+            form.reset(); // Limpia todos los campos del formulario
+            $('#saldoAhorroContainer').hide();
+        }
 
         $(document).ready(function() {
             $('#tablaPrestamos').DataTable({
@@ -464,7 +513,7 @@
                     } else {
                         // Llenar los campos del formulario con los datos del préstamo
                         $('#editPrestamoId').val(response.id);
-                        $('#editClienteId').val(response.cliente_id);
+                        $('#editClienteId').val(response.numero_socio);
                         $('#editMonto').val(response.monto);
                         $('#editInteres').val(response.interes);
                         $('#editPlazo').val(response.plazo);
@@ -608,632 +657,151 @@ function formatEstado(estado) {
     }
 }
     </script>
-    <script>
-        function verAmortizacion(button) {
-            const prestamoId = $(button).data('id');
 
-            fetch(`/functions/get_amortizacion.php?prestamo_id=${prestamoId}`)
-                .then(response => response.json())
-                .then(data => {
+    <script>
+
+        $(document).on('click', '.btnAmortizacion', function () {
+            const prestamoId = $(this).data('prestamo-id');
+
+            // Llamar al backend para obtener la tabla de amortización
+            $.ajax({
+                url: '/functions/prestamos/obtener_amortizacion.php',
+                type: 'GET',
+                data: { prestamo_id: prestamoId },
+                success: function (response) {
+                    const data = JSON.parse(response);
+
                     if (data.success) {
-                        mostrarModalAmortizacion(data.amortizacion);
+                        const amortizacion = data.amortizacion;
+
+                        // Si la tabla de amortización está vacía, mostrar alerta
+                        if (amortizacion.length === 0) {
+                            Swal.fire('Error', 'El préstamo seleccionado no tiene tabla de amortización.', 'error');
+                            return;
+                        }
+
+                        // Generar la tabla
+                        let contenido = `
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cuota</th>
+                                        <th>Fecha Pago</th>
+                                        <th>Monto Cuota</th>
+                                        <th>Interés</th>
+                                        <th>Capital</th>
+                                        <th>Saldo Restante</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+
+                        amortizacion.forEach(cuota => {
+                            const estadoClase = cuota.estado === 'pagada' ? 'badge bg-success' : 'badge bg-warning';
+                            const acciones = cuota.estado === 'pendiente' ? `
+                                <button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id}, 'cuota')">Pagar</button>
+                                <button class="btn btn-info btn-sm" onclick="procesarPago(${cuota.id}, 'capital')">Abonar Capital</button>
+                                <button class="btn btn-danger btn-sm" onclick="procesarPago(${cuota.id}, 'interes')">Pago Interés</button>
+                            ` : '';
+
+                            contenido += `
+                                <tr>
+                                    <td>${cuota.cuota_numero}</td>
+                                    <td>${cuota.fecha_pago}</td>
+                                    <td>RD$${parseFloat(cuota.monto_cuota).toFixed(2)}</td>
+                                    <td>RD$${parseFloat(cuota.interes).toFixed(2)}</td>
+                                    <td>RD$${parseFloat(cuota.capital).toFixed(2)}</td>
+                                    <td>RD$${parseFloat(cuota.saldo_restante).toFixed(2)}</td>
+                                    <td><span class="${estadoClase}">${cuota.estado}</span></td>
+                                    <td>${acciones}</td>
+                                </tr>
+                            `;
+                        });
+
+                        contenido += `
+                                </tbody>
+                            </table>
+                        `;
+
+                        // Mostrar la tabla en el modal
+                        $('#tablaAmortizacionContainer').html(contenido);
+                        $('#modalAmortizacion').modal('show');
                     } else {
                         Swal.fire('Error', data.message, 'error');
                     }
-                })
-                .catch(error => {
-                    Swal.fire('Error', 'No se pudo obtener la tabla de amortización.', 'error');
-                    console.error(error);
-                });
-        }
-
-       /* function mostrarModalAmortizacion(amortizacion) {
-            let tableRows = amortizacion.map(row => `
-                <tr>
-                    <td>${row.cuota}</td>
-                    <td>${row.fecha_pago}</td>
-                    <td>RD$${row.cuota_mensual}</td>
-                    <td>RD$${row.interes}</td>
-                    <td>RD$${row.capital}</td>
-                    <td>RD$${row.saldo_restante}</td>
-                </tr>
-            `).join('');
-
-            const modalHtml = `
-                <div class="modal" id="modalAmortizacion" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header" style="background-color: #198754;">
-                                <h4 class="modal-title" style="color: white">Tabla de Amortización</h4>
-                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Cuota</th>
-                                            <th>Fecha de Pago</th>
-                                            <th>Cuota Mensual</th>
-                                            <th>Interés</th>
-                                            <th>Capital</th>
-                                            <th>Saldo Restante</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${tableRows}</tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            $('body').append(modalHtml);
-            $('#modalAmortizacion').modal('show');
-        } */
-
-        function mostrarModalAmortizacion(amortizacion, prestamo_id) {
-            let tableRows = amortizacion.map(row => `
-                <tr>
-                    <td>${row.cuota_numero}</td>
-                    <td>${row.fecha_pago}</td>
-                    <td>RD$${row.monto_cuota}</td>
-                    <td>RD$${row.interes}</td>
-                    <td>RD$${row.capital}</td>
-                    <td>RD$${row.saldo_restante}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm"> 
-                            Abonar capital
-                        </button>
-                        <button class="btn btn-warning btn-sm"> 
-                            Pagar interes
-                        </button>
-                        <button class="btn btn-success btn-sm" 
-                            onclick="abrirModalPago(${prestamo_id}, ${row.cuota}, ${row.saldo_restante}, ${row.monto_cuota})">
-                            Pagar cuota
-                        </button>
-                        
-                    <!--    <button type="button" 
-                                class="btn btn-primary btn-pagar" 
-                                data-prestamo_id="1" 
-                                data-cuota_monto="2000" 
-                                data-toggle="modal" 
-                                data-target="#modalPagarCuota">
-                            Pagar
-                        </button> -->
-
-                    </td>
-                </tr>
-            `).join('');
-
-            const modalHtml = `
-                <div class="modal" id="modalAmortizacion" tabindex="-1" data-bs-backdrop="static">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header" style="background-color: #198754;">
-                                <h4 class="modal-title" style="color: white">Tabla de Amortización</h4>
-                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Cuota</th>
-                                            <th>Fecha de Pago</th>
-                                            <th>Cuota Mensual</th>
-                                            <th>Interés</th>
-                                            <th>Capital</th>
-                                            <th>Saldo Restante</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${tableRows}</tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            $('body').append(modalHtml);
-            $('#modalAmortizacion').modal('show');
-        }
-
-       /* function abrirModalPago(prestamoId, cuotaNumero, saldoRestante) {
-            const modalHtml = `
-                <div class="modal" id="modalPago" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header" style="background-color: #ffc107;">
-                                <h4 class="modal-title" style="color: white">Registrar Pago</h4>
-                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="formPago">
-                                    <input type="hidden" name="prestamo_id" value="${prestamoId}">
-                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}">
-                                    <div class="mb-3">
-                                        <label for="saldoRestante" class="form-label">Saldo Restante</label>
-                                        <input type="text" id="saldoRestante" class="form-control" value="RD$${saldoRestante}" disabled>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="metodoPago" class="form-label">Método de Pago</label>
-                                        <select id="metodoPago" name="metodo_pago" class="form-select">
-                                            <option value="efectivo">Efectivo</option>
-                                            <option value="ahorro">Ahorro</option>
-                                            <option value="transferencia">Transferencia</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="montoPago" class="form-label">Monto a Pagar</label>
-                                        <input type="number" id="montoPago" name="monto_pago" class="form-control" min="1" required>
-                                    </div>
-                                    <button type="button" class="btn btn-primary" onclick="registrarPago()">Registrar Pago</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            $('body').append(modalHtml);
-            $('#modalPago').modal('show');
-        }*/
-
-        function abrirModalPago(prestamoId, cuotaNumero, saldoRestante, montoCuota) {
-           // console.log('montoCuota:', montoCuota); // Verifica el valor de montoCuota
-            //console.log('Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero);
-
-              // Mostrar valores en la consola para verificar
-            console.log('Abrir modal - Prestamo ID:', prestamoId, 'Cuota Número:', cuotaNumero, 'Monto Cuota:', montoCuota);
-
-            const modalHtml = `
-                <div class="modal" id="modalPago" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header" style="background-color:rgb(7, 85, 255);">
-                                <h4 class="modal-title" style="color: white">Registrar Pago</h4>
-                                <button type="button" class="btn-close cerrarModal" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="formPago">
-                                    <input type="hidden" name="prestamo_id" value="${prestamoId}">
-                                    <input type="hidden" name="cuota_numero" value="${cuotaNumero}"> 
-                                   <!--  <input type="hidden" name="prestamo_id" id="prestamoId" value="${prestamoId}">
-                                     <input type="hidden" name="cuota_numero" id="cuotaNumero" value="${cuotaNumero}"> -->
-                                    <div class="mb-3">
-                                        <label for="saldoRestante" class="form-label">Saldo Restante</label>
-                                        <input type="text" id="saldoRestante" class="form-control" value="RD$${saldoRestante}" disabled>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="metodoPago" class="form-label">Método de Pago</label>
-                                        <select id="metodoPago" name="metodo_pago" class="form-select">
-                                            <option value="efectivo">Efectivo</option>
-                                            <option value="ahorro">Ahorro</option>
-                                            <option value="transferencia">Transferencia</option>
-                                        </select>
-                                    </div> 
-                                    <div class="mb-3">
-                                        <label for="montoPago" class="form-label">Monto a Pagar</label>
-                                        <input type="number" id="montoPago" name="monto_pago" class="form-control" min="1" value="${montoCuota}" readonly required>
-                                    </div>
-                                    <button type="button" class="btn btn-primary" onclick="registrarPago()">Registrar Pago</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            $('#modalPago').remove(); // Elimina cualquier modal existente antes de agregar uno nuevo
-            $('body').append(modalHtml);
-            $('#modalPago').modal('show');
-        }
-
-
-       /* function registrarPago() {
-            const formData = $('#formPago').serialize();
-
-            $.ajax({
-                url: '/functions/registrar_pago.php',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    const res = JSON.parse(response);
-                    Swal.fire({
-                        icon: res.success ? 'success' : 'error',
-                        title: res.success ? 'Éxito' : 'Error',
-                        text: res.message,
-                    });
-
-                    if (res.success) {
-                        $('#modalPago').modal('hide');
-                        $('#modalAmortizacion').modal('hide');
-                        // Recargar la tabla de amortización (puedes ajustar esta lógica según tu flujo)
-                        cargarAmortizacion(formData.prestamo_id);
-                    }
                 },
                 error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudo procesar el pago.',
-                    });
+                    Swal.fire('Error', 'No se pudo cargar la tabla de amortización.', 'error');
                 }
             });
-        } */
+        });
 
-        function registrarPago() {
-            const formData = $('#formPago').serialize();
-            console.log('FormData enviado:', formData); // Agrega esta línea para depuración.
 
+        // Abrir el modal con los datos de la cuota seleccionada
+        function pagarCuota(cuotaId) {
             $.ajax({
-                url: '/functions/registrar_pago.php',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    const res = JSON.parse(response);
-                    console.log('Respuesta del servidor:', res); // Agrega esta línea para ver la respuesta.
-                    Swal.fire({
-                        icon: res.success ? 'success' : 'error',
-                        title: res.success ? 'Éxito' : 'Error',
-                        text: res.message,
-                    });
-
-                    if (res.success) {
-                        $('#modalPago').modal('hide');
-                        $('#modalAmortizacion').modal('hide');
-                        cargarAmortizacion(formData.prestamo_id);
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudo procesar el pago.',
-                    });
-                }
-            });
-        } 
-
-        function cargarTablaAmortizacion(prestamoId) {
-    $.ajax({
-        url: '/functions/cargar_amortizacion.php', // Backend para obtener la tabla de amortización
-        type: 'POST',
-        data: { prestamo_id: prestamoId },
-        success: function (response) {
-            const data = JSON.parse(response);
-            if (data.success) {
-                const tablaBody = $("#tablaAmortizacion tbody");
-                tablaBody.empty();
-                data.cuotas.forEach((cuota) => {
-                    const estadoCuota = cuota.estado_cuota === 'pagada' ? 'Pagada' : 'Pendiente';
-                    const btnAccion = cuota.estado_cuota === 'pagada'
-                        ? '<button class="btn btn-secondary btn-sm" disabled>Pagada</button>'
-                        : `<button class="btn btn-success btn-sm" onclick="pagarCuota(${prestamoId}, ${cuota.cuota_numero}, ${cuota.monto_cuota})">Pagar</button>`;
-                    
-                    const fila = `
-                        <tr>
-                            <td>${cuota.cuota_numero}</td>
-                            <td>${cuota.fecha_pago}</td>
-                            <td>RD$${cuota.monto_cuota.toFixed(2)}</td>
-                            <td>RD$${cuota.interes.toFixed(2)}</td>
-                            <td>RD$${cuota.capital.toFixed(2)}</td>
-                            <td>RD$${cuota.saldo_restante.toFixed(2)}</td>
-                            <td>${btnAccion}</td>
-                        </tr>
-                    `;
-                    tablaBody.append(fila);
-                });
-                $("#modalTablaAmortizacion").modal("show");
-            } else {
-                Swal.fire("Error", data.message, "error");
-            }
-        },
-        error: function () {
-            Swal.fire("Error", "No se pudo cargar la tabla de amortización.", "error");
-        }
-    });
-}
-
-/*function pagarCuota(prestamoId, cuotaNumero, montoCuota) {
-    Swal.fire({
-        title: 'Confirmar Pago',
-        text: `¿Desea pagar la cuota #${cuotaNumero} por RD$${montoCuota.toFixed(2)}?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, pagar',
-        cancelButtonText: 'Cancelar',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/functions/pagar_cuota.php',
-                type: 'POST',
-                data: { prestamo_id: prestamoId, cuota_numero: cuotaNumero, monto_pago: montoCuota },
+                url: '/functions/prestamos/obtener_datos_cuota.php',
+                type: 'GET',
+                data: { cuota_id: cuotaId },
                 success: function (response) {
                     const data = JSON.parse(response);
+
                     if (data.success) {
-                        Swal.fire("Éxito", data.message, "success").then(() => {
-                            cargarTablaAmortizacion(prestamoId);
-                        });
+                        // Rellenar los datos en el modal
+                        $('#cuotaId').val(data.cuota.id);
+                        $('#montoPrestamo').val(`RD$${parseFloat(data.prestamo.monto).toFixed(2)}`);
+                        $('#montoCuota').val(`RD$${parseFloat(data.cuota.monto_cuota).toFixed(2)}`);
+
+                        if (data.ahorro) {
+                            $('#saldoAhorro').val(`RD$${parseFloat(data.ahorro.monto).toFixed(2)}`);
+                        } else {
+                            $('#saldoAhorroContainer').hide();
+                        }
+
+                        $('#modalPagarCuota').modal('show');
                     } else {
-                        Swal.fire("Error", data.message, "error");
+                        Swal.fire('Error', data.message, 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire("Error", "No se pudo procesar el pago.", "error");
+                    Swal.fire('Error', 'No se pudieron cargar los datos de la cuota.', 'error');
                 }
             });
         }
-    });
-} */
 
-$('#datatable').on('click', '.btn-amortizacion', function () {
-    const prestamoId = $(this).data('prestamo-id');
+        // Procesar el pago de la cuota
+        function procesarPagoCuota() {
+            const cuotaId = $('#cuotaId').val();
+            const metodoPago = $('#metodoPago').val();
+            const montoCuota = parseFloat($('#montoCuota').val().replace('RD$', '').replace(',', ''));
+            const saldoAhorro = parseFloat($('#saldoAhorro').val().replace('RD$', '').replace(',', '') || 0);
 
-    $.ajax({
-        url: '/functions/cargar_amortizacion.php',
-        type: 'POST',
-        data: { prestamo_id: prestamoId },
-        success: function (response) {
-            if (response.success) {
-                // Renderizar la tabla de cuotas con los datos recibidos
-                renderTablaAmortizacion(response.cuotas);
-            } else {
-                Swal.fire('Error', response.message, 'error');
-            }
-        },
-        error: function () {
-            Swal.fire('Error', 'No se pudo cargar la amortización.', 'error');
-        }
-    });
-});
-
-function renderTablaAmortizacion(cuotas) {
-    let html = `
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Fecha de Pago</th>
-                    <th>Cuota</th>
-                    <th>Interés</th>
-                    <th>Capital</th>
-                    <th>Saldo Restante</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    cuotas.forEach(cuota => {
-        html += `
-            <tr>
-                <td>${cuota.cuota_numero}</td>
-                <td>${cuota.fecha_pago}</td>
-                <td>${cuota.monto_cuota}</td>
-                <td>${cuota.interes}</td>
-                <td>${cuota.capital}</td>
-                <td>${cuota.saldo_restante}</td>
-            </tr>
-        `;
-    });
-
-    html += `
-            </tbody>
-        </table>
-    `;
-
-    $('#modal-amortizacion .modal-body').html(html);
-    $('#modal-amortizacion').modal('show');
-}
-
-/*// Función para cargar la tabla de amortización
-function cargarTablaAmortizacion(prestamoId) {
-    $.ajax({
-        url: '/functions/get_amortizacion.php', // Archivo backend para obtener datos de amortización
-        type: 'POST',
-        data: { prestamo_id: prestamoId },
-        dataType: 'json',
-        success: function (response) {
-            if (response.success) {
-                mostrarModalAmortizacion(response.data);
-            } else {
-                Swal.fire('Error', response.message, 'error');
-            }
-        },
-        error: function () {
-            Swal.fire('Error', 'No se pudo cargar la tabla de amortización.', 'error');
-        }
-    });
-} 
-
-
-// Función para mostrar la tabla de amortización en un modal
-function mostrarModalAmortizacion(amortizacion) {
-    let contenido = `
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Cuota</th>
-                    <th>Fecha Pago</th>
-                    <th>Monto Cuota</th>
-                    <th>Interés</th>
-                    <th>Capital</th>
-                    <th>Saldo Restante</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    amortizacion.forEach(cuota => {
-        const estadoClase = cuota.estado === 'pagada' ? 'bg-success' : 'bg-warning';
-        const botonPagar = cuota.estado === 'pendiente' 
-            ? `<button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id})">Pagar</button>` 
-            : '';
-
-        contenido += `
-            <tr>
-                <td>${cuota.cuota_numero}</td>
-                <td>${cuota.fecha_pago}</td>
-                <td>RD$${cuota.monto_cuota}</td>
-                <td>RD$${cuota.interes}</td>
-                <td>RD$${cuota.capital}</td>
-                <td>RD$${cuota.saldo_restante}</td>
-                <td><span class="badge ${estadoClase}">${cuota.estado || 'Desconocido'}</span></td>
-                <td>${botonPagar}</td>
-            </tr>
-        `;
-    });
-
-
-    contenido += `
-            </tbody>
-        </table>
-    `;
-
-    Swal.fire({
-        title: 'Tabla de Amortización',
-        html: contenido,
-        width: '80%',
-        showCloseButton: true,
-        confirmButtonText: 'Cerrar'
-    });
-}
-
-function pagarCuota(cuotaId) {
-    // Modal con el formulario de pago
-    Swal.fire({
-        title: 'Pagar Cuota',
-        html: `
-            <form id="formPagoCuota">
-                <div class="form-group">
-                    <label for="monto_pago">Monto a Pagar</label>
-                    <input type="number" class="form-control" id="monto_pago" name="monto_pago" placeholder="Ingrese el monto" required>
-                </div>
-                <div class="form-group">
-                    <label for="metodo_pago">Método de Pago</label>
-                    <select class="form-control" id="metodo_pago" name="metodo_pago" required>
-                        <option value="efectivo">Efectivo</option>
-                        <option value="tarjeta">Tarjeta</option>
-                        <option value="transferencia">Transferencia</option>
-                    </select>
-                </div>
-            </form>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Pagar',
-        preConfirm: () => {
-            const montoPago = document.getElementById('monto_pago').value;
-            const metodoPago = document.getElementById('metodo_pago').value;
-
-            if (!montoPago || !metodoPago) {
-                Swal.showValidationMessage('Todos los campos son obligatorios');
+            if (!metodoPago) {
+                Swal.fire('Error', 'Seleccione un método de pago.', 'error');
+                return;
             }
 
-            return { monto_pago: montoPago, metodo_pago: metodoPago };
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            realizarPagoCuota(cuotaId, result.value);
-        }
-    });
-}
-*/
-
-// Función para cargar la tabla de amortización
-function cargarTablaAmortizacion(prestamoId) {
-    $.ajax({
-        url: '/functions/get_amortizacion.php', // Archivo backend para obtener datos de amortización
-        type: 'POST',
-        data: { prestamo_id: prestamoId },
-        dataType: 'json',
-        success: function (response) {
-            if (response.success) {
-                // Llamar a la función mostrarModalAmortizacion con los datos obtenidos
-                mostrarModalAmortizacion(response.data);
-            } else {
-                Swal.fire('Error', response.message, 'error');
+            if (metodoPago === 'ahorro' && saldoAhorro < montoCuota) {
+                Swal.fire('Error', 'El saldo de ahorro es insuficiente para realizar el pago.', 'error');
+                return;
             }
-        },
-        error: function () {
-            Swal.fire('Error', 'No se pudo cargar la tabla de amortización.', 'error');
-        }
-    });
-}
 
-// Función para mostrar la tabla de amortización en un modal
-function mostrarModalAmortizacion(amortizacion) {
-    let contenido = `
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Cuota</th>
-                    <th>Fecha Pago</th>
-                    <th>Monto Cuota</th>
-                    <th>Interés</th>
-                    <th>Capital</th>
-                    <th>Saldo Restante</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    amortizacion.forEach(cuota => {
-        const estadoClase = cuota.estado === 'pagada' ? 'bg-success' : 'bg-warning';
-        const botonPagar = cuota.estado === 'pendiente' 
-            ? `<button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id})">Pagar</button>` 
-            : '';
-
-        contenido += `
-            <tr>
-                <td>${cuota.cuota_numero}</td>
-                <td>${cuota.fecha_pago}</td>
-                <td>RD$${parseFloat(cuota.monto_cuota).toFixed(2)}</td>
-                <td>RD$${parseFloat(cuota.interes).toFixed(2)}</td>
-                <td>RD$${parseFloat(cuota.capital).toFixed(2)}</td>
-                <td>RD$${parseFloat(cuota.saldo_restante).toFixed(2)}</td>
-                <td><span class="badge ${estadoClase}">${cuota.estado || 'Desconocido'}</span></td>
-                <td>${botonPagar}</td>
-            </tr>
-        `;
-    });
-
-    contenido += `
-            </tbody>
-        </table>
-    `;
-
-    Swal.fire({
-        title: 'Tabla de Amortización',
-        html: contenido,
-        width: '80%',
-        showCloseButton: true,
-        confirmButtonText: 'Cerrar'
-    });
-}
-
-// Función para manejar el pago de una cuota
-function pagarCuota(cuotaId) {
-    Swal.fire({
-        title: 'Confirmar Pago',
-        text: `¿Deseas pagar la cuota seleccionada?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Pagar',
-        cancelButtonText: 'Cancelar'
-    }).then(result => {
-        if (result.isConfirmed) {
             $.ajax({
-                url: '/functions/pagar_cuota.php',
+                url: '/functions/prestamos/procesar_pago_cuota.php',
                 type: 'POST',
-                data: { cuota_id: cuotaId },
-                dataType: 'json',
+                data: { cuota_id: cuotaId, metodo_pago: metodoPago },
                 success: function (response) {
-                    if (response.success) {
-                        Swal.fire('Éxito', 'La cuota ha sido pagada.', 'success');
-                        // Recargar la tabla de amortización
-                        cargarTablaAmortizacion(response.prestamo_id);
+                    const data = JSON.parse(response);
+
+                    if (data.success) {
+                        Swal.fire('Éxito', 'Pago procesado correctamente.', 'success').then(() => {
+                            $('#modalPagarCuota').modal('hide');
+                            location.reload(); // Recargar la página o actualizar la tabla de amortización
+                        });
                     } else {
-                        Swal.fire('Error', response.message, 'error');
+                        Swal.fire('Error', data.message, 'error');
                     }
                 },
                 error: function () {
@@ -1241,36 +809,16 @@ function pagarCuota(cuotaId) {
                 }
             });
         }
-    });
-}
 
-
-function realizarPagoCuota(cuotaId, datosPago) {
-    $.ajax({
-        url: '/functions/pagar_cuota.php', // Endpoint backend
-        type: 'POST',
-        data: { 
-            cuota_id: cuotaId, 
-            monto_pago: datosPago.monto_pago, 
-            metodo_pago: datosPago.metodo_pago 
-        },
-        dataType: 'json',
-        success: function (response) {
-            if (response.success) {
-                Swal.fire('Éxito', 'El pago se ha registrado correctamente.', 'success').then(() => {
-                    // Actualizar la tabla de amortización
-                    cargarTablaAmortizacion(response.prestamo_id);
-                });
+        // Mostrar/ocultar el saldo de ahorro dependiendo del método seleccionado
+        $('#metodoPago').on('change', function () {
+            const metodo = $(this).val();
+            if (metodo === 'ahorro') {
+                $('#saldoAhorroContainer').show();
             } else {
-                Swal.fire('Error', response.message, 'error');
+                $('#saldoAhorroContainer').hide();
             }
-        },
-        error: function () {
-            Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
-        }
-    });
-}
-
+        });
 
     </script>
     

@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Obtener datos de la tabla de amortización
-        $stmt = $conn->prepare("SELECT cuota_numero, fecha_pago, monto_cuota, interes, capital, saldo_restante 
+        $stmt = $conn->prepare("SELECT cuota_numero, fecha_pago, monto_cuota, interes, capital, saldo_restante, estado 
                                 FROM tabla_amortizacion 
                                 WHERE prestamo_id = :prestamo_id");
         $stmt->execute([':prestamo_id' => $prestamo_id]);

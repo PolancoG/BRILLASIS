@@ -20,13 +20,15 @@
     $telefono = $_POST['telefono'];
     $correo = $_POST['correo'];
     $interes_fijo = $_POST['interes_fijo'];
+    $estado = $_POST['estado'] ?? 'activo'; // Si no se envía, por defecto es "activo"
 
     try {
-        $stmt = $conn->prepare("UPDATE compania SET nombre = ?, rnc = ?, direccion = ?, telefono = ?, correo = ?, interes_fijo = ? WHERE id = ?");
-        $stmt->execute([$nombre, $rnc, $direccion, $telefono, $correo, $interes_fijo, $id]);
-
+        $stmt = $conn->prepare("UPDATE compania SET nombre = ?, rnc = ?, direccion = ?, telefono = ?, correo = ?, interes_fijo = ?, estado = ? WHERE id = ?");
+        $stmt->execute([$nombre, $rnc, $direccion, $telefono, $correo, $interes_fijo, $estado, $id]);
+    
         echo json_encode(['success' => true]);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+
 ?>

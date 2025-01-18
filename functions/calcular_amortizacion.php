@@ -14,10 +14,10 @@ function calcularAmortizacion($monto, $interes, $plazo) {
         $amortizacion[] = [
             'cuota' => $i,
             'fecha_pago' => date('Y-m-d', strtotime("+$i month")),
-            'cuota_mensual' => round($cuotaMensual, 2),
-            'interes' => round($interesCuota, 2),
-            'capital' => round($capital, 2),
-            'saldo_restante' => round($saldo, 2)
+            'cuota_mensual' => round($cuotaMensual),
+            'interes' => round($interesCuota),
+            'capital' => round($capital),
+            'saldo_restante' => round($saldo)
         ];
     }
 

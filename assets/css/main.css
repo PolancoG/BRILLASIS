@@ -332,7 +332,7 @@
 }
 .status.delivered {
   padding: 2px 4px;
-  background: #71bb1c;
+  background: #4c850c;
   color: var(--black1);
   border-radius: 4px;
   font-size: 14px;
@@ -340,7 +340,7 @@
 }
 .status.pending {
   padding: 2px 4px;
-  background: #e9b10a;
+  background: #d49c00;
   color: var(--black1);
   border-radius: 4px;
   font-size: 14px;
@@ -348,7 +348,7 @@
 }
 .status.return {
   padding: 2px 4px;
-  background: #f00;
+  background: rgb(160, 21, 21);
   color: var(--black1);
   border-radius: 4px;
   font-size: 14px;

@@ -347,9 +347,12 @@
     $contrato = $_FILES['contrato'] ?? null;
     $rutaCedula = null;
     $rutaContrato = null;
+    $maxFileSize = 1048576; // 1MB en bytes
+
+    $estado = $_POST['estado'] ?? 'activo'; // Por defecto 'activo' si no se envía
 
     // Validación de campos obligatorios
-    if (!$cedula || !$nombre || !$direccion || !$telefono1 || !$sexo || !$estado_civil || !$nacionalidad || !$sucursal_id) {
+    if (!$cedula || !$nombre || !$direccion || !$telefono1 || !$sexo || !$estado_civil || !$nacionalidad || !$sucursal_id || !$imageCedula || !$contrato) {
         echo json_encode(['success' => false, 'message' => 'Por favor complete todos los campos obligatorios.']);
         exit;
     }
@@ -366,20 +369,28 @@
         if (empty($id)) {
             // Subir archivos solo si es un nuevo cliente
             if ($imageCedula && $imageCedula['error'] === UPLOAD_ERR_OK) {
+                if ($imageCedula['size'] > $maxFileSize) {
+                    echo json_encode(['success' => false, 'message' => 'La imagen de la cédula no debe exceder 1MB.']);
+                    exit;
+                }
                 $rutaCedula = guardarArchivo($imageCedula, '../uploads/cedulas');
             }
 
             if ($contrato && $contrato['error'] === UPLOAD_ERR_OK) {
+                if ($contrato['size'] > $maxFileSize) {
+                    echo json_encode(['success' => false, 'message' => 'El formulario no debe exceder 1MB.']);
+                    exit;
+                }
                 $rutaContrato = guardarArchivo($contrato, '../uploads/contratos');
             }
 
             $stmt = $conn->prepare("
                 INSERT INTO cliente (
                     numero_socio, cedula, nombre, apellido, direccion, lugar_trabajo, telefono1, telefono2, correo_personal, correo_institucional, 
-                    sucursal_id, sexo, estado_civil, nacionalidad, ingresos_mensuales, otros_ingresos, descripcion, image_cedula, contrato
+                    sucursal_id, sexo, estado_civil, nacionalidad, ingresos_mensuales, otros_ingresos, descripcion, image_cedula, contrato, estado
                 ) VALUES (
                     :numero_socio, :cedula, :nombre, :apellido, :direccion, :lugar_trabajo, :telefono1, :telefono2, :correo_personal, :correo_institucional, 
-                    :sucursal_id, :sexo, :estado_civil, :nacionalidad, :ingresos_mensuales, :otros_ingresos, :descripcion, :image_cedula, :contrato
+                    :sucursal_id, :sexo, :estado_civil, :nacionalidad, :ingresos_mensuales, :otros_ingresos, :descripcion, :image_cedula, :contrato, :estado
                 )
             ");
 
@@ -403,6 +414,7 @@
                 ':descripcion' => $descripcion,
                 ':image_cedula' => $rutaCedula,
                 ':contrato' => $rutaContrato,
+                ':estado' => $estado, 
             ]);
 
             echo json_encode(['success' => true, 'message' => 'El Número del Socio es: ' . '<b>' . $numeroSocio . '</b>']);
@@ -423,8 +435,8 @@
                     correo_personal = :correo_personal, correo_institucional = :correo_institucional, 
                     sucursal_id = :sucursal_id, sexo = :sexo, estado_civil = :estado_civil, nacionalidad = :nacionalidad, 
                     ingresos_mensuales = :ingresos_mensuales, otros_ingresos = :otros_ingresos, descripcion = :descripcion,
-                    image_cedula = COALESCE(:image_cedula, image_cedula),
-                    contrato = COALESCE(:contrato, contrato)
+                    image_cedula = COALESCE(:image_cedula, image_cedula), contrato = COALESCE(:contrato, contrato),
+                    estado = :estado
                 WHERE id = :id
             ");
 
@@ -447,6 +459,7 @@
                 ':descripcion' => $descripcion,
                 ':image_cedula' => $rutaCedula,
                 ':contrato' => $rutaContrato,
+                ':estado' => $estado,
                 ':id' => $id,
             ]);
 

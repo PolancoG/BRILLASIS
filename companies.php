@@ -46,6 +46,24 @@
             margin-bottom: 30px; /* Espacio entre el buscador y la tabla */
         }
     </style>
+    <style>
+     .badge {
+        padding: 0.5em 0.8em;
+        font-size: 0.9em;
+        border-radius: 0.5rem;
+        color: #fff;
+        display: inline-block;
+        width: fit-content;
+    }
+
+    .bg-success {
+        background-color: #28a745; /* Verde */
+    }
+
+    .bg-danger {
+        background-color: #dc3545; /* Rojo */
+    }
+    </style>
 
     <title>BRILLASIS Compañías</title> 
 </head>
@@ -187,36 +205,46 @@
                 <table id="tablaCompanias" class="display table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Nombre</th>
                             <th>RNC</th>
                             <th>Dirección</th>
                             <th>Teléfono</th>
                             <th>Correo</th>
                             <th>Interés fijo</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
+
                         $stmt = $conn->prepare("SELECT * FROM compania");
                         $stmt->execute();
                         $companias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                         foreach ($companias as $compania) {
+
+                            // Estado con estilos dinámicos
+                            $estadoClase = '';
+                            if ($compania['estado'] == 'activo') $estadoClase = 'bg-success';
+                            elseif ($compania['estado'] == 'inactivo') $estadoClase = 'bg-danger';
+
                             echo "<tr>
-                                    <td>{$compania['id']}</td>
                                     <td>{$compania['nombre']}</td>
                                     <td>{$compania['rnc']}</td>
                                     <td>{$compania['direccion']}</td>
                                     <td>{$compania['telefono']}</td>
                                     <td>{$compania['correo']}</td>
                                     <td>{$compania['interes_fijo']}%</td>
+                                    <td><span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $compania['estado'])) . "</span></td>
+                                    
                                     <td>
                                         <button class='btn btn-warning btnEditarCompania' data-id='{$compania['id']}'><i class='bx bxs-edit'></i></button>
                                         <button class='btn btn-danger btnEliminarCompania' data-id='{$compania['id']}'><i class='bx bxs-trash' ></i></button> 
                                     </td>
                                 </tr>";
                         }
+                                //<td>{$compania['estado']}</td>
                         ?>
                     </tbody>
                 </table>
@@ -297,7 +325,7 @@
                     $('#editarTelefono').val(compania.telefono);
                     $('#editarCorreo').val(compania.correo);
                     $('#editarInteresFijo').val(compania.interes_fijo);
-                    
+                    $('#editarEstado').val(compania.estado || 'activo'); // Establecer estado
                     $('#modalEditarCompania').modal('show');
                 }
             });

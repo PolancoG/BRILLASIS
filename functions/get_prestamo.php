@@ -19,7 +19,11 @@
 
         try {
             // Consulta para obtener los datos del préstamo
-            $stmt = $conn->prepare("SELECT * FROM prestamo WHERE id = :id");
+            //$stmt = $conn->prepare("SELECT * FROM prestamo WHERE id = :id");
+            $stmt = $conn->prepare("SELECT prestamo.*, cliente.numero_socio 
+                                    FROM prestamo
+                                    JOIN cliente ON prestamo.cliente_id = cliente.id
+                                    WHERE prestamo.id = :id");
             $stmt->execute([':id' => $id]);
             $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 

@@ -14,11 +14,11 @@
     $result = $conn->query($sql); //conn es el objeto conexión
     $total = $result->fetchColumn();
 
-    $sqli = "SELECT COUNT(*) FROM compania";
+    $sqli = "SELECT COUNT(*) FROM compania WHERE estado = 'activo';";
     $results = $conn->query($sqli); //conn es el objeto conexión
     $totalcli = $results->fetchColumn();
 
-    $sqlp = "SELECT COUNT(*) FROM prestamo;";
+    $sqlp = "SELECT COUNT(*) FROM prestamo WHERE estado != 'activo_terminado';";
     $resultp = $conn->query($sqlp); //conn es el objeto conexión
     $totalp = $resultp->fetchColumn();
 
@@ -31,7 +31,7 @@
     $resultpr1 = $conn->query($sqlpr1); //conn es el objeto conexión
     $totalpr1 = $resultpr1->fetchColumn();
 
-    $sqlcli = "SELECT COUNT(*) FROM cliente";
+    $sqlcli = "SELECT COUNT(*) FROM cliente WHERE estado = 'activo';";
     $resultcli = $conn->query($sqlcli); //conn es el objeto conexión
     $totalClientes = $resultcli->fetchColumn();
 
@@ -258,7 +258,7 @@
         <div class="details">
             <div class="recentOrders">
                 <div class="cardHeader">
-                    <h2>Prestamos</h2>
+                    <h2>Algunos Prestamos</h2>
                     <?php if($role == 'admin' || $role == 'cajerop') { ?>
                       <a href="prestamos" class="btn">Ver todos</a>
                     <?php } ?>
@@ -280,19 +280,36 @@
                             // Consulta con unión para obtener información del cliente
                             $stmt = $conn->query("SELECT prestamo.id, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
                                                 FROM prestamo
-                                                JOIN cliente ON prestamo.cliente_id = cliente.id");
+                                                JOIN cliente ON prestamo.cliente_id = cliente.id
+                                                LIMIT 10");
                             while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 $estadoClase = '';
-                                if ($prestamo['estado'] == 'activo_bien') $estadoClase = 'status delivered';
-                                elseif ($prestamo['estado'] == 'activo_problemas') $estadoClase = 'status pending';
-                                elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'status pending';
-                                elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'status return';
+                                if ($prestamo['estado'] == 'activo_bien') {
+                                    $estadoClase = 'status delivered';
+                                    $title = 'Activo Bien';
+                                }
+                                elseif ($prestamo['estado'] == 'activo_problemas'){
+                                    $estadoClase = 'status pending';
+                                    $title = 'Activo Problemas';
+                                } 
+                                elseif ($prestamo['estado'] == 'activo_terminado'){
+                                    $estadoClase = 'status return';
+                                    $title = 'Activo Terminado';
+                                }
+                                elseif ($prestamo['estado'] == 'pendiente'){
+                                    $estadoClase = 'status pending';
+                                    $title = 'Pendiente';
+                                }
+                                elseif ($prestamo['estado'] == 'cancelado'){
+                                    $estadoClase = 'status return';
+                                    $title = 'Cancelado';
+                                }
 
                                 echo "<tr>";
                                 echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
                                 //echo "<td> $" . $prestamo['monto'] . "</td>";
                                 echo "<td> RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
-                                echo "<td><span class='$estadoClase'>" . ucfirst($prestamo['estado']). "</span></td>";
+                                echo "<td><span class='$estadoClase' style='color: white;'>" . ucfirst($title). "</span></td>";
                                 echo "</tr>";
                             }
                         ?>
@@ -305,7 +322,7 @@
                 <div class="cardHeader">
                     <h2>Recientes</h2>
                 </div>
-
+                            
                 <table>
                     <tr>
                         <td width="60px">

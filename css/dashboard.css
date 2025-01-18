@@ -20,6 +20,17 @@
     text-align: center; /* Centrar el texto */
 }
 
+.badge2 {
+    display: inline-block;
+    background-color: #ff4949; /* Color de fondo */
+    color: #000; /* Color del texto */
+    padding: 5px 10px; /* Espaciado alrededor del texto */
+    border-radius: 5px; /* Bordes redondeados */
+    font-weight: bold; /* Texto en negrita */
+    font-size: 14px; /* Tamaño de fuente */
+    text-align: center; /* Centrar el texto */
+}
+
 .item {
     display: flex;
     flex: 3;

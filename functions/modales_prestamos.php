@@ -39,9 +39,9 @@
                             <option selected disabled value="">Seleccione una Opción</option>
                             <option value="activo_bien">Activo Bien</option>
                             <option value="activo_problemas">Activo Pendiente</option>
-                            <option value="activo_terminado">Activo Terminado</option>
+                            <option value="activo_terminado">Activo Terminado</option> 
                             <option value="pendiente">Pendiente</option>
-                            <option value="cancelado">Cancelado</option>
+                            <option value="cancelado">Cancelado</option> 
                         </select>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                     
                             <!-- Para Admin -->
                         <div class="form-group">
-                            <label>ID del Socio <i class="text-danger">*</i></label>
+                            <label>Numero del Socio <i class="text-danger">*</i></label>
                             <input type="text" id="editClienteId" class="form-control" readonly>
                         </div>
                         <div class="form-group">
