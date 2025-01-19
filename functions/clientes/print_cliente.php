@@ -44,10 +44,16 @@
     $stmtp->execute([':id' => $id]);
     $prestamos = $stmtp->fetch(PDO::FETCH_ASSOC); 
 
+    // Información de préstamos
+    $stmtc = $conn->prepare("SELECT monto AS en_curso FROM prestamo WHERE cliente_id = :id AND estado = 'activo_bien'");
+    $stmtc->execute([':id' => $id]);
+    $enCurso = $stmtc->fetch(PDO::FETCH_ASSOC); 
+
     $im = 'RD$'. number_format($cliente['ingresos_mensuales'], 2);
     $oi = 'RD$' . number_format($cliente['otros_ingresos'], 2);
     $ah = 'RD$' . number_format($ahorros['total_ahorros'] ?? 0, 2);
     $p = 'RD$' . number_format($prestamos['total_prestamos'] ?? 0, 2);
+    $en = 'RD$' . number_format($enCurso['en_curso'] ?? 0, 2);
 
     if (!$cliente) {
         die('Cliente no encontrado');
@@ -143,8 +149,9 @@
                 <h2>Información Financiera:</h2><br>
                 <strong>Ingresos Mensuales:</strong> {$im}<br>
                 <strong>Otros Ingresos:</strong> {$oi}<br>
-                <strong>Total Ahorrado:</strong> {$ah}<br>
-                <strong>Prestamo:</strong> {$p}<br>
+                <strong>Total $ Ahorrado:</strong> {$ah}<br>
+                <strong>Total $ Prestamos:</strong> {$p}<br>
+                <strong>Monto de prestamo en curso:</strong> {$en}<br>
                 
                 <h2>Compañía y Sucursal:</h2><br>
                 <strong>Compañía:</strong> {$cliente['compania_nombre']}<br>
@@ -154,7 +161,7 @@
     </table>
     <br><br>
     <div class="footer">
-        Este documento es para fines de consulta del detalle de dicho cliente.
+        Este documento es para fines de consulta del detalle de dicho socio.
     </div>
     HTML;
     

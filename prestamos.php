@@ -203,66 +203,63 @@
                 <br><br>
 
                 <table id="tablaPrestamos" class="display table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th># Socio</th>
-            <th>Socio</th>
-            <th>Monto</th>
-            <th>Interés</th>
-            <th>Plazo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        require 'db.php';
-        // Consulta para obtener los datos de los préstamos con el cliente relacionado
-        $stmt = $conn->query("SELECT prestamo.id, cliente.numero_socio, cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, prestamo.plazo, prestamo.estado
-                            FROM prestamo
-                            JOIN cliente ON prestamo.cliente_id = cliente.id");
-        while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo "<tr>";
-            echo "<td>" . $prestamo['numero_socio'] . "</td>";
-            echo "<td>" . $prestamo['cliente_nombre'] . "</td>";
-            echo "<td>RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
-            echo "<td>" . $prestamo['interes'] . "%</td>";
-            echo "<td>" . $prestamo['plazo'] . "</td>";
+                    <thead>
+                        <tr>
+                            <th># Socio</th>
+                            <th>Socio</th>
+                            <th>Monto</th>
+                            <th>Interés</th>
+                            <th>Plazo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        require 'db.php';
+                        // Consulta para obtener los datos de los préstamos con el cliente relacionado
+                        $stmt = $conn->query("SELECT prestamo.id, cliente.numero_socio, cliente.apellido, 
+                                                    cliente.nombre AS cliente_nombre, prestamo.monto, prestamo.interes, 
+                                                    prestamo.plazo, prestamo.estado
+                                            FROM prestamo
+                                            JOIN cliente ON prestamo.cliente_id = cliente.id");
+                        while ($prestamo = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            echo "<tr>";
+                            echo "<td>" . $prestamo['numero_socio'] . "</td>";
+                            echo "<td>" . $prestamo['cliente_nombre'] .''. $prestamo['apellido']."</td>";
+                            echo "<td>RD$" . number_format($prestamo['monto'], 2, '.', ',') . "</td>";
+                            echo "<td>" . $prestamo['interes'] . "%</td>";
+                            echo "<td>" . $prestamo['plazo'] . "</td>";
 
-            // Estado con estilos dinámicos
-            $estadoClase = '';
-            if ($prestamo['estado'] == 'activo_bien') $estadoClase = 'bg-success';
-            elseif ($prestamo['estado'] == 'activo_problemas') $estadoClase = 'bg-warning';
-            elseif ($prestamo['estado'] == 'activo_terminado') $estadoClase = 'bg-danger';
-            elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'bg-warning';
-            elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'bg-danger';
+                            // Estado con estilos dinámicos
+                            $estadoClase = '';
+                            if ($prestamo['estado'] == 'activo_bien') $estadoClase = 'bg-success';
+                            elseif ($prestamo['estado'] == 'activo_problemas') $estadoClase = 'bg-warning';
+                            elseif ($prestamo['estado'] == 'activo_terminado') $estadoClase = 'bg-danger';
+                            elseif ($prestamo['estado'] == 'pendiente') $estadoClase = 'bg-warning';
+                            elseif ($prestamo['estado'] == 'cancelado') $estadoClase = 'bg-danger';
 
-            echo "<td><span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) . "</span></td>";
+                            echo "<td><span class='badge $estadoClase'>" . ucfirst(str_replace('_', ' ', $prestamo['estado'])) . "</span></td>";
 
-            // Acciones con botones dinámicos
-            echo "<td>
-                <button class='btn btn-primary btn-sm btnAmortizacion' data-prestamo-id='{$prestamo['id']}'><i class='bx bxs-user-detail'></i></button>
-                <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'>
-                    <i class='bx bxs-edit'></i>
-                </button>
-                <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'>
-                    <i class='bx bxs-trash'></i>
-                </button>
-            </td>";
-            echo "</tr>";
-        }
-        ?>
-    </tbody>
-</table>
-
-
-
-                
-
+                            // Acciones con botones dinámicos
+                            echo "<td>
+                                <button class='btn btn-primary btn-sm btnAmortizacion' data-prestamo-id='{$prestamo['id']}'><i class='bx bxs-user-detail'></i></button>
+                                <button class='btn btn-warning btn-sm' data-id='" . $prestamo['id'] . "' onclick='editarPrestamo(this)'>
+                                    <i class='bx bxs-edit'></i>
+                                </button>
+                                <button class='btn btn-danger btn-sm' onclick='eliminarPrestamo(" . $prestamo['id'] . ")'>
+                                    <i class='bx bxs-trash'></i>
+                                </button>
+                            </td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     
-
+        <!-- Modal para mostrar la tabla de amortizacion -->
         <div class="modal fade" id="modalAmortizacion" tabindex="-1" aria-labelledby="modalAmortizacionLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl"> <!-- Cambiado a modal-xl para mayor ancho -->
                 <div class="modal-content">
@@ -276,90 +273,65 @@
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" id="btnDescargarPDF" class="btn btn-primary">Descargar Tabla</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>
         </div>
 
-<!-- Modal para Pago de Cuota -->
-<div class="modal fade" id="modalPagarCuota" tabindex="-1" role="dialog" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalPagarCuotaLabel">Pagar Cuota</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="limpiarForm()"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formPagarCuota">
-                    <input type="hidden" id="cuotaId" name="cuota_id">
-
-                    <div class="row">
-                        <!-- Monto del Préstamo -->
-                        <div class="form-group col-md-6">
-                            <label for="montoPrestamo">Monto Total del Préstamo</label>
-                            <input type="text" class="form-control" id="montoPrestamo" readonly>
-                        </div>
-
-                        <!-- Monto de la Cuota -->
-                        <div class="form-group col-md-6">
-                            <label for="montoCuota">Monto de la Cuota</label>
-                            <input type="text" class="form-control" id="montoCuota" readonly>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <!-- Método de Pago -->
-                        <div class="form-group col-md-6">
-                            <label for="metodoPago">Método de Pago</label>
-                            <select class="form-control" id="metodoPago" name="metodo_pago" required>
-                                <option value="" disabled selected>Seleccione un método</option>
-                                <option value="efectivo">Efectivo</option>
-                                <option value="ahorro">Ahorro</option>
-                            </select>
-                        </div>
-
-                        <!-- Saldo de Ahorro -->
-                        <div class="form-group col-md-6" id="saldoAhorroContainer" style="display: none;">
-                            <label for="saldoAhorro">Saldo Actual de Ahorro</label>
-                            <input type="text" class="form-control" id="saldoAhorro" readonly>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="limpiarForm()">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="procesarPagoCuota()">Pagar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-        <!--<div class="modal fade" id="modalPagarCuota" tabindex="-1" role="dialog" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <!-- Modal para Pago de Cuota -->
+        <div class="modal fade" id="modalPagarCuota" tabindex="-1" role="dialog" aria-labelledby="modalPagarCuotaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalPagarCuotaLabel">Pagar Cuota</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-header" style="background-color:rgb(25, 85, 135);">
+                        <h5 class="modal-title" id="modalPagarCuotaLabel" style="color: white">Pagar Cuota</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="limpiarForm()"></button>
                     </div>
                     <div class="modal-body">
                         <form id="formPagarCuota">
-                            <input type="hidden" id="cuotaId">
-                            <div class="form-group">
-                                <label for="montoPago">Monto a Pagar</label>
-                                <input type="text" class="form-control" id="montoPago" required>
+                            <input type="hidden" id="cuotaId" name="cuota_id">
+
+                            <div class="row">
+                                <!-- Monto del Préstamo -->
+                                <div class="form-group col-md-6">
+                                    <label for="montoPrestamo">Monto Total del Préstamo</label>
+                                    <input type="text" class="form-control" id="montoPrestamo" readonly>
+                                </div>
+
+                                <!-- Monto de la Cuota -->
+                                <div class="form-group col-md-6">
+                                    <label for="montoCuota">Monto de la Cuota</label>
+                                    <input type="text" class="form-control" id="montoCuota" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <!-- Método de Pago -->
+                                <div class="form-group col-md-6">
+                                    <label for="metodoPago">Método de Pago</label>
+                                    <select class="form-control" id="metodoPago" name="metodo_pago" required>
+                                        <option value="" disabled selected>Seleccione un método</option>
+                                        <option value="efectivo">Efectivo</option>
+                                        <option value="ahorro">Ahorro</option>
+                                    </select>
+                                </div>
+
+                                <!-- Saldo de Ahorro -->
+                                <div class="form-group col-md-6" id="saldoAhorroContainer" style="display: none;">
+                                    <label for="saldoAhorro">Saldo Actual de Ahorro</label>
+                                    <input type="text" class="form-control" id="saldoAhorro" readonly>
+                                </div>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="procesarPago()">Pagar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="limpiarForm()">Cerrar</button>
+                        <button type="button" class="btn btn-primary" onclick="procesarPagoCuota()">Pagar</button>
                     </div>
                 </div>
             </div>
-        </div> -->
-
+        </div>
 
         <!-- Modales de agregar y editar -->
         <?php include './functions/modales_prestamos.php' ?>
@@ -725,6 +697,9 @@ function formatEstado(estado) {
                             </table>
                         `;
 
+                        // Asignar dinámicamente el prestamo_id al botón de descarga
+                        $('#btnDescargarPDF').attr('data-prestamo-id', prestamoId);
+
                         // Mostrar la tabla en el modal
                         $('#tablaAmortizacionContainer').html(contenido);
                         $('#modalAmortizacion').modal('show');
@@ -738,6 +713,23 @@ function formatEstado(estado) {
             });
         });
 
+        $('#modalAmortizacion').on('show.bs.modal', function (event) {
+            const prestamoId = $(event.relatedTarget).data('prestamo-id');
+            $('#btnDescargarPDF').data('prestamo-id', prestamoId);
+        });
+
+
+        $(document).on('click', '#btnDescargarPDF', function () {
+            const prestamoId = $(this).data('prestamo-id');
+
+            if (!prestamoId) {
+                Swal.fire('Error', 'No se pudo identificar el préstamo.', 'error');
+                return;
+            }
+
+            // Redirigir al archivo PHP con el ID del préstamo como parámetro
+            window.open(`/functions/prestamos/generar_pdf_amortizacion.php?prestamo_id=${prestamoId}`, '_blank');
+        });
 
         // Abrir el modal con los datos de la cuota seleccionada
         function pagarCuota(cuotaId) {

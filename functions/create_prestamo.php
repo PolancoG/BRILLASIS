@@ -232,7 +232,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             // Verificar si el cliente tiene préstamos pendientes
-            $stmt = $conn->prepare("SELECT * FROM prestamo WHERE cliente_id = :cliente_id AND estado != 'cancelado'");
+            $stmt = $conn->prepare("
+                SELECT * 
+                FROM prestamo 
+                WHERE cliente_id = :cliente_id 
+                AND estado NOT IN ('cancelado', 'activo_terminado')
+            ");
+            $stmt->execute([':cliente_id' => $cliente_id]);
+            $prestamoExistente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($prestamoExistente) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'El cliente ya tiene un préstamo activo o pendiente.'
+                ]);
+                exit;
+            }
+
+           /* $stmt = $conn->prepare("SELECT * FROM prestamo WHERE cliente_id = :cliente_id AND estado != 'cancelado'");
             $stmt->execute([':cliente_id' => $cliente_id]);
             $prestamoExistente = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -242,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'message' => 'El cliente ya tiene un préstamo registrado.'
                 ]);
                 exit;
-            }
+            } */
 
             // Iniciar transacción
             $conn->beginTransaction();

@@ -35,10 +35,12 @@
     $resultcli = $conn->query($sqlcli); //conn es el objeto conexión
     $totalClientes = $resultcli->fetchColumn();
 
-    $sqlirec = "SELECT SUM((monto * interes) / 100) AS total_intereses FROM prestamo";
+    $sqlirec = "SELECT SUM(monto_interes) AS total_interes 
+                FROM interes_recaudado 
+                WHERE YEAR(fecha_recaudo) = YEAR(CURDATE())";
+    //$sqlirec = "SELECT SUM(monto_interes) FROM interes_recaudado";
     $resultirec = $conn->query($sqlirec); //conn es el objeto conexión
     $irec = $resultirec->fetchColumn();
-
 
 ?>
 <!DOCTYPE html>

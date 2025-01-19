@@ -455,7 +455,6 @@
                 </div>
             </div>
 
-
             <!-- Modal para detalles del cliente -->
             <div class="modal fade" id="modalDetalleCliente" data-bs-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="modalDetalleClienteLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl" role="document">
@@ -513,6 +512,9 @@
                                     <div class="col-md-4">
                                         <p><strong>Préstamos Totales:</strong> <span id="detalle_prestamos"></span></p>
                                     </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Monto préstamo en curso:</strong> <span id="detalle_prestamo_curso"></span></p>
+                                    </div>
                                 </div>
                             </fieldset>
 
@@ -554,6 +556,9 @@
                     </div>
                 </div>
             </div>
+
+
+            
 
             <!-- Modal "¿Qué deseas ver?" -->
 <div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
@@ -712,7 +717,7 @@
         
 
             //Muestrar los detalles del cliente en el modal 
-            $(document).on('click', '.btnDetalle', function() {
+         /*   $(document).on('click', '.btnDetalle', function() {
                 const id = $(this).data('id');
 
                 // Almacenar el ID del cliente en el modal
@@ -761,7 +766,58 @@
                         }
                     })
                     .catch(() => Swal.fire('Error', 'No se pudo cargar el detalle del cliente.', 'error'));
-            });
+            }); */
+
+            $(document).on('click', '.btnDetalle', function() {
+    const id = $(this).data('id');
+
+    $('#modalDetalleCliente').data('id', id);
+
+    fetch(`/functions/clientes/get_detalle_cliente.php?id=${id}`)
+        .then(res => res.json())
+        .then(response => {
+            if (response.error) {
+                Swal.fire('Error', response.error, 'error');
+            } else {
+                const c = response.cliente;
+
+                const formatCurrency = (value) => {
+                    return new Intl.NumberFormat('es-DO', {
+                        style: 'currency',
+                        currency: 'DOP'
+                    }).format(value);
+                };
+
+                $('#detalle_numero_socio').text(c.numero_socio);
+                $('#detalle_cedula').text(c.cedula);
+                $('#detalle_nombre').text(c.nombre);
+                $('#detalle_apellido').text(c.apellido);
+                $('#detalle_direccion').text(c.direccion);
+                $('#detalle_telefono1').text(c.telefono1);
+                $('#detalle_telefono2').text(c.telefono2);
+                $('#detalle_correo_personal').text(c.correo_personal);
+                $('#detalle_correo_institucional').text(c.correo_institucional);
+                $('#detalle_sexo').text(c.sexo);
+                $('#detalle_estado_civil').text(c.estado_civil);
+                $('#detalle_nacionalidad').text(c.nacionalidad);
+                $('#detalle_lugar_trabajo').text(c.lugar_trabajo);
+
+                $('#detalle_ingresos_mensuales').text(formatCurrency(c.ingresos_mensuales));
+                $('#detalle_otros_ingresos').text(formatCurrency(c.otros_ingresos));
+                $('#detalle_descripcion').text(c.descripcion);
+                $('#detalle_ahorros').text(formatCurrency(response.ahorros || 0));
+                $('#detalle_prestamos').text(formatCurrency(response.prestamos || 0));
+                $('#detalle_prestamo_curso').text(formatCurrency(response.total || 0));
+
+                $('#detalle_sucursal').text(c.sucursal_nombre);
+                $('#detalle_compania').text(c.compania_nombre);
+
+                $('#modalDetalleCliente').modal('show');
+            }
+        })
+        .catch(() => Swal.fire('Error', 'No se pudo cargar el detalle del cliente.', 'error'));
+});
+
 
             //Obtener los datos del cliente para llenar el modal de editar
             $(document).on('click', '.btnEditar', function () {

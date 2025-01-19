@@ -49,11 +49,17 @@
         $stmt->execute([':id' => $id]);
         $prestamos = $stmt->fetch(PDO::FETCH_ASSOC)['total_prestamos'] ?? 0;
 
+         // Información de préstamos
+         $stmt = $conn->prepare("SELECT monto AS total FROM prestamo WHERE cliente_id = :id AND estado = 'activo_bien'");
+         $stmt->execute([':id' => $id]);
+         $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
         if ($cliente) {
             echo json_encode([
                 'cliente' => $cliente,
                 'ahorros' => $ahorros,
-                'prestamos' => $prestamos
+                'prestamos' => $prestamos,
+                'total' => $total
             ]);
         } else {
             echo json_encode(['error' => 'Cliente no encontrado.']);

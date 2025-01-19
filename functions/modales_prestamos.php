@@ -14,9 +14,20 @@
                         <select name="cliente_id" id="cliente_id" class="form-control" required>
                             <option selected disabled value="">Seleccione un socio</option>
                             <?php
-                            $stmt = $conn->query("SELECT cliente.id, cliente.nombre FROM cliente WHERE cliente.id NOT IN (SELECT cliente_id FROM prestamo WHERE estado != 'cancelado')");
+                            //$stmt = $conn->query("SELECT cliente.id, cliente.nombre FROM cliente WHERE cliente.id NOT IN (SELECT cliente_id FROM prestamo WHERE estado != 'cancelado')");
+                            // Consulta actualizada
+                            $stmt = $conn->query("
+                                SELECT cliente.id, cliente.nombre, cliente.apellido 
+                                FROM cliente 
+                                WHERE cliente.id NOT IN (
+                                    SELECT cliente_id 
+                                    FROM prestamo 
+                                    WHERE estado NOT IN ('cancelado', 'activo_terminado')
+                                )
+                            ");
                             while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='{$cliente['id']}'>{$cliente['nombre']}</option>";
+                                $nombreCompleto = $cliente['nombre'] .' '. $cliente['apellido'];
+                                echo "<option value='{$cliente['id']}'>{$nombreCompleto}</option>";
                             }
                             ?>
                         </select>

@@ -186,15 +186,16 @@
                         // Modificación de la consulta para unir las tablas ahorro y cliente
                         include 'db.php';
                         
-                        $stmt = $conn->query("SELECT ahorro.id, ahorro.cliente_id, cliente.numero_socio, cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
-                                        FROM ahorro
-                                        JOIN cliente ON ahorro.cliente_id = cliente.id");
+                        $stmt = $conn->query("SELECT ahorro.id, ahorro.cliente_id, cliente.numero_socio, cliente.apellido, 
+                                                    cliente.nombre AS cliente_nombre, ahorro.monto, ahorro.fecha
+                                            FROM ahorro
+                                            JOIN cliente ON ahorro.cliente_id = cliente.id");
                   
                         
                         while ($ahorro = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             echo "<tr>";
                                 echo "<td>" . $ahorro['numero_socio']. "</td>";
-                                echo "<td>" . $ahorro['cliente_nombre'] . "</td>"; // Mostrar el nombre del cliente 
+                                echo "<td>" . $ahorro['cliente_nombre'] . ' '. $ahorro['apellido'] ."</td>"; // Mostrar el nombre del cliente 
                                 // echo "<td>" .  . "</td>";
                                 echo "<td> RD$" . number_format($ahorro['monto'], 2, '.', ',') . "</td>";
                                 echo "<td>" . $ahorro['fecha'] . "</td>";
