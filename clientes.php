@@ -561,35 +561,35 @@
             
 
             <!-- Modal "¿Qué deseas ver?" -->
-<div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalOpcionesLabel">¿Qué deseas ver?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal fade" id="modalOpciones" tabindex="-1" aria-labelledby="modalOpcionesLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalOpcionesLabel">¿Qué deseas ver?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <button class="btn btn-secondary btnVerCedula">Ver Cédula</button>
+                            <button class="btn btn-primary btnVerContrato">Descargar Contrato</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body text-center">
-                <button class="btn btn-secondary btnVerCedula">Ver Cédula</button>
-                <button class="btn btn-primary btnVerContrato">Descargar Contrato</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Modal "Cédula del Socio" -->
-<div class="modal fade" id="modalCedula" tabindex="-1" aria-labelledby="modalCedulaLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalCedulaLabel">Cédula del Socio</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Modal "Cédula del Socio" -->
+            <div class="modal fade" id="modalCedula" tabindex="-1" aria-labelledby="modalCedulaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalCedulaLabel">Cédula del Socio</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="cedulaImagen" src="" alt="Imagen de la Cédula" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body text-center">
-                <img id="cedulaImagen" src="" alt="Imagen de la Cédula" class="img-fluid">
-            </div>
-        </div>
-    </div>
-</div>
 
 
             <!-- End clientes -->

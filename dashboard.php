@@ -34,7 +34,7 @@
     $sqlcli = "SELECT COUNT(*) FROM cliente WHERE estado = 'activo';";
     $resultcli = $conn->query($sqlcli); //conn es el objeto conexión
     $totalClientes = $resultcli->fetchColumn();
-
+    
     $sqlirec = "SELECT SUM(monto_interes) AS total_interes 
                 FROM interes_recaudado 
                 WHERE YEAR(fecha_recaudo) = YEAR(CURDATE())";

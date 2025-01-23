@@ -24,8 +24,8 @@
 
             $_SESSION['alerta'] = [
                 'icon' => 'success',
-                'title' => 'Ahorro eliminado',
-                'text' => 'El ahorro ha sido eliminado correctamente.'
+                'title' => 'Prestamo eliminado',
+                'text' => 'El prestamo ha sido eliminado correctamente.'
             ];
             
             // Redirigir con éxito

@@ -319,8 +319,8 @@
 
                                 <!-- Saldo de Ahorro -->
                                 <div class="form-group col-md-6" id="saldoAhorroContainer" style="display: none;">
-                                    <label for="saldoAhorro">Saldo Actual de Ahorro</label>
-                                    <input type="text" class="form-control" id="saldoAhorro" readonly>
+                                    <strong><label for="saldoAhorro">Saldo Actual de Ahorro</label></strong> 
+                                    <input type="text" class="form-control" id="saldoAhorro" style="font-weight: bold;" readonly>
                                 </div>
                             </div>
                         </form>
@@ -333,10 +333,104 @@
             </div>
         </div>
 
+        <!-- Modal abonar capital -->
+        <!--<div class="modal fade" id="modalAbonarCapital" tabindex="-1" aria-labelledby="modalAbonarCapitalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:rgb(47, 186, 204);">
+                        <h5 class="modal-title" id="modalAbonarCapitalLabel" style="color: white">Abono al Capital</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formAbonarCapital">
+                            <input type="hidden" id="capitalCuotaId">
+                            <div class="form-group mb-3">
+                                <label for="saldoRestante">Saldo Restante del Préstamo</label>
+                                <input type="text" class="form-control" id="saldoRestante" readonly>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="montoAbonoCapital">Monto a Abonar</label>
+                                <input type="number" class="form-control" id="montoAbonoCapital" placeholder="Ingrese el monto a abonar" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="procesarAbonoCapital()">Abonar</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <div class="modal fade" id="modalAbonarCapital" tabindex="-1" aria-labelledby="modalAbonarCapitalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:rgb(47, 186, 204);">
+                        <h5 class="modal-title" id="modalAbonarCapitalLabel" style="color: white">Abono al Capital</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formAbonarCapital">
+                            <input type="hidden" id="capitalCuotaId">
+                            <div class="form-group mb-3">
+                                <label for="saldoRestante">Saldo Restante del Préstamo</label>
+                                <input type="text" class="form-control" id="saldoRestante" readonly>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="montoAbonoCapital">Monto a Abonar</label>
+                                <input type="number" class="form-control" id="montoAbonoCapital" placeholder="Ingrese el monto a abonar" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="cuotasRestantes">Cuotas Restantes del Préstamo</label>
+                                <input type="number" class="form-control" id="cuotasRestantes" readonly>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="procesarAbonoCapital()">Abonar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal pago interes -->
+
+        <div class="modal fade" id="modalPagoInteres" tabindex="-1" aria-labelledby="modalPagoInteresLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:rgb(231, 79, 79);">
+                        <h5 class="modal-title" id="modalPagoInteresLabel" style="color: white">Pago de Interés</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formPagoInteres">
+                            <input type="hidden" id="interesCuotaId">
+                            <div class="form-group mb-3">
+                                <label for="montoPagoInteres">Monto del Interés</label>
+                                <input type="text" class="form-control" id="montoPagoInteres" readonly>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="montoConfirmarInteres">Confirmar Monto a Pagar</label>
+                                <input type="number" class="form-control" id="montoConfirmarInteres" placeholder="Ingrese el monto del interés" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="companiaCliente">Compañía del Cliente</label>
+                                <input type="text" class="form-control" id="companiaCliente" readonly>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="realizarPagoInteres()">Pagar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Modales de agregar y editar -->
         <?php include './functions/modales_prestamos.php' ?>
 
-        <!-- ===========    Hasta aqui el crud CRUD de prestamos   =========== -->
+        <!-- ===========    Hasta aqui el crud CRUD de prestamos    =========== -->
 
         <br><br><br><br>           
     </section>
@@ -674,8 +768,9 @@ function formatEstado(estado) {
                             const estadoClase = cuota.estado === 'pagada' ? 'badge bg-success' : 'badge bg-warning';
                             const acciones = cuota.estado === 'pendiente' ? `
                                 <button class="btn btn-primary btn-sm" onclick="pagarCuota(${cuota.id}, 'cuota')">Pagar</button>
-                                <button class="btn btn-info btn-sm" onclick="procesarPago(${cuota.id}, 'capital')">Abonar Capital</button>
+                                <button class="btn btn-info btn-sm" onclick="procesarAbonoCapital(${cuota.id})">Abonar Capital</button>
                                 <button class="btn btn-danger btn-sm" onclick="procesarPago(${cuota.id}, 'interes')">Pago Interés</button>
+
                             ` : '';
 
                             contenido += `
@@ -812,7 +907,155 @@ function formatEstado(estado) {
             }
         });
 
+
+        //Aqui empieza la logica de pago de interes y de abono capital. 
+        function procesarAbonoCapital(cuotaId) {
+            $('#capitalCuotaId').val(cuotaId); // Asignar cuotaId al modal
+            $('#modalAbonarCapital').modal('show');
+        }
+
+        function procesarPago(cuotaId, tipoPago) {
+            if (tipoPago === 'interes') {
+                $.ajax({
+                    url: '/functions/prestamos/obtener_datos_cliente.php',
+                    type: 'GET',
+                    data: { cuota_id: cuotaId },
+                    success: function (response) {
+                        const data = JSON.parse(response);
+
+                        if (data.success) {
+                            $('#interesCuotaId').val(cuotaId);
+                            $('#montoPagoInteres').val(data.interes);
+                            $('#companiaCliente').val(data.compania);
+                            $('#modalPagoInteres').modal('show');
+
+                            // Log para depuración
+                            console.log('Datos cargados en el modal:', data);
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo cargar la información del cliente.', 'error');
+                    },
+                });
+            }
+        }
+
+       /* function procesarPago(cuotaId, tipo) {
+            if (tipo === 'interes') {
+                $('#interesCuotaId').val(cuotaId); // Asignar cuotaId al modal
+                $.ajax({
+                    url: '/functions/prestamos/obtener_cuota_interes.php', // Endpoint para obtener información de la cuota
+                    type: 'GET',
+                    data: { cuota_id: cuotaId },
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            $('#montoPagoInteres').val(data.interes); // Mostrar el monto del interés
+                            $('#modalPagoInteres').modal('show');
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo cargar el monto del interés.', 'error');
+                    }
+                });
+            }
+        } */
+
+        function realizarAbonoCapital() {
+            const cuotaId = $('#capitalCuotaId').val();
+            const montoAbono = $('#montoAbonoCapital').val();
+
+            if (!montoAbono || montoAbono <= 0) {
+                Swal.fire('Error', 'Debe ingresar un monto válido.', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: '/functions/prestamos/abonar_capital.php', // Endpoint para procesar el abono
+                type: 'POST',
+                data: { cuota_id: cuotaId, monto_abono: montoAbono },
+                success: function (response) {
+                    const data = JSON.parse(response);
+                    if (data.success) {
+                        Swal.fire('Éxito', 'Abono al capital realizado correctamente.', 'success')
+                            .then(() => location.reload()); // Recargar tabla
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'No se pudo realizar el abono al capital.', 'error');
+                }
+            });
+        }
+
+      /*  function realizarPagoInteres() {
+            const cuotaId = $('#interesCuotaId').val();
+            const montoInteres = $('#montoPagoInteres').val();
+
+            $.ajax({
+                url: '/functions/prestamos/pagar_interes.php', // Endpoint para procesar el pago de interés
+                type: 'POST',
+                data: { cuota_id: cuotaId, monto_interes: montoInteres },
+                success: function (response) {
+                    const data = JSON.parse(response);
+                    if (data.success) {
+                        Swal.fire('Éxito', 'Pago de interés realizado correctamente.', 'success')
+                            .then(() => location.reload()); // Recargar tabla
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error', 'No se pudo realizar el pago de interés.', 'error');
+                }
+            });
+        } */
+
+        function realizarPagoInteres() {
+    const cuotaId = $('#interesCuotaId').val();
+    const montoConfirmarInteres = $('#montoConfirmarInteres').val();
+
+    // Log para depuración
+    console.log({ cuotaId, montoConfirmarInteres });
+
+    if (!cuotaId || !montoConfirmarInteres) {
+        Swal.fire('Error', 'Por favor complete todos los campos.', 'error');
+        return;
+    }
+
+    // Enviar datos al backend
+    $.ajax({
+        url: '/functions/prestamos/pagar_interes.php',
+        type: 'POST',
+        data: {
+            cuota_id: cuotaId,
+            monto_interes: montoConfirmarInteres,
+        },
+        success: function (response) {
+            console.log('Respuesta del servidor:', response); // Log para depuración
+            const data = JSON.parse(response);
+
+            if (data.success) {
+                Swal.fire('Éxito', 'Pago realizado correctamente.', 'success').then(() => {
+                    $('#modalPagoInteres').modal('hide');
+                    location.reload();
+                });
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
+        },
+    });
+}
+
+
     </script>
-    
 </body>
 </html>
