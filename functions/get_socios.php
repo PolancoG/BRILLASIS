@@ -23,7 +23,7 @@ if (!$compania_id) {
 try {
     // Unir tablas: cliente -> sucursal -> compañía
     $stmt = $conn->prepare("
-        SELECT cliente.id, cliente.nombre, ahorro.monto AS ahorro 
+        SELECT cliente.id, cliente.nombre, cliente.apellido, ahorro.monto AS ahorro 
         FROM cliente
         JOIN ahorro ON cliente.id = ahorro.cliente_id
         JOIN sucursal ON cliente.sucursal_id = sucursal.id

@@ -22,7 +22,7 @@
 
     try {
         $stmt = $conn->prepare("
-            SELECT c.id, c.nombre 
+            SELECT c.id, c.nombre, c.apellido
             FROM cliente c
             JOIN ahorro a ON c.id = a.cliente_id
             JOIN sucursal s ON c.sucursal_id = s.id

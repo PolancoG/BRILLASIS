@@ -201,7 +201,10 @@
                                 echo "<td>" . $ahorro['fecha'] . "</td>";
                                 if($role == 'admin') { 
                                     echo "<td>
-                                        <button class='btn btn-warning btn-sm' data-id='" . $ahorro['id'] . "' onclick='editarAhorro(this)'><i class='bx bxs-edit'></i></button>
+                                        <button class='btn btn-warning btn-sm' data-id='" . $ahorro['id'] . "' onclick='editarAhorro(this)' hidden><i class='bx bxs-edit'></i></button>
+                                        <button class='btn btn-info btn-sm' data-id='" . $ahorro['cliente_id'] . "' onclick='verAhorros(this)'>
+                                            <i class='bx bx-search'></i>
+                                        </button>
                                         <button class='btn btn-danger btn-sm' onclick='eliminarAhorro(" . $ahorro['id'] . ")'><i class='bx bxs-trash'></i></button>
                                     </td>";
                                 } else {
@@ -235,9 +238,9 @@
                                 <select name="cliente_id" class="form-control" required>
                                     <option selected disabled value="">Seleccione una Opción</option>
                                     <?php
-                                    $stmt = $conn->query("SELECT cliente.id, cliente.nombre FROM cliente WHERE cliente.id NOT IN (SELECT cliente_id FROM ahorro WHERE monto IS NOT NULL)");
+                                    $stmt = $conn->query("SELECT cliente.id, cliente.nombre, cliente.apellido FROM cliente WHERE cliente.id NOT IN (SELECT cliente_id FROM ahorro WHERE monto IS NOT NULL)");
                                     while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo "<option value='{$cliente['id']}'>{$cliente['nombre']}</option>";
+                                        echo "<option value='{$cliente['id']}'>{$cliente['nombre']} {$cliente['apellido']}</option>";
                                     }
                                     ?>
                                 </select>
@@ -344,51 +347,40 @@
         </div>
 
 
-
-        <!--
-        <div class="modal fade" id="modalAgregarMontoAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalAgregarMontoAhorroLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form id="formAgregarMontoAhorro">
-                        <div class="modal-header" style="background-color: #198754; color: white;">
-                            <h4 class="modal-title" id="modalAgregarMontoAhorroLabel">Agregar Dinero al Ahorro</h4>
-                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" onclick="limpiarFormulario()"></button>
-                        </div>
-                        <div class="modal-body">
-                            <h5><strong>Nota:</strong><i> todos los campos con * son obligatorios.</i></h5>
-                            <br>
-                            <div class="form-group">
-                                <label for="compania">Compañía <i class="text-danger">*</i></label>
-                                <select id="compania" name="compania_id" class="form-control" required>
-                                    <option value="" selected disabled>Seleccione una Compañía</option>
-                                    <?php
-                                    $stmt = $conn->query("SELECT id, nombre FROM compania");
-                                    while ($compania = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo "<option value='{$compania['id']}'>{$compania['nombre']}</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="cliente_id">Socio <i class="text-danger">*</i></label>
-                                <select id="cliente_id" name="cliente_id" class="form-control" required>
-                                    <option value="" selected disabled>Seleccione el socio de la compañía</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="monto">Monto a depositar: <i class="text-danger">*</i></label>
-                                <input type="text" id="monto" name="monto" class="form-control" placeholder="Ingrese el monto adicional" onkeyPress='return isNumber(event.key);' required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Agregar Dinero</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="limpiarFormulario()">Cerrar</button>
-                        </div>
-                    </form>
+<!-- Modal para ver los ahorros del cliente -->
+<div class="modal fade" id="modalVerAhorros" tabindex="-1" aria-labelledby="modalVerAhorrosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:rgb(47, 186, 204);">
+                <h5 class="modal-title" id="modalVerAhorrosLabel" style="color: white">Historial de Ahorros</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="clienteAhorrosId">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fecha y hora</th>
+                                <th>Monto</th>
+                                <th>Número de Socio</th>
+                                <th>Comentario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAhorrosBody">
+                            <!-- Aquí se insertarán los registros dinámicamente -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
-                                -->
+    </div>
+</div>
+
+
 
         <div class="modal fade" id="modalRetirarAhorro" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalRetirarAhorroLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -506,6 +498,43 @@
         <?php unset($_SESSION['alerta']); endif; ?>
     </script>
     <script>
+
+function verAhorros(button) {
+    const clienteId = $(button).data('id');
+
+    $.ajax({
+        url: '/functions/get_ahorros_info.php',
+        type: 'GET',
+        data: { cliente_id: clienteId },
+        success: function (response) {
+            const data = JSON.parse(response);
+
+            if (data.success) {
+                let contenido = '';
+                data.ahorros.forEach(ahorro => {
+                    contenido += `
+                        <tr>
+                            <td>${ahorro.fecha_agregado}</td>
+                            <td>RD$${parseFloat(ahorro.monto_agregado).toFixed(2)}</td>
+                            <td>${ahorro.numero_socio}</td>
+                            <td>${ahorro.comentario || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+
+                $('#tablaAhorrosBody').html(contenido);
+                $('#modalVerAhorros').modal('show');
+            } else {
+                Swal.fire('Error', 'No se encontraron registros de ahorros para este cliente.', 'error');
+            }
+        },
+        error: function () {
+            Swal.fire('Error', 'No se pudo obtener la información de los ahorros.', 'error');
+        }
+    });
+}
+
+
       /*  $(document).ready(function () {
             // Cargar clientes al seleccionar una compañía
             $('#compania').on('change', function () {
@@ -576,7 +605,7 @@
                             const clienteSelect = $('#cliente_id');
                             clienteSelect.empty().append('<option value="" selected disabled>Seleccione el socio</option>');
                             clientes.forEach(cliente => {
-                                clienteSelect.append(`<option value="${cliente.id}">${cliente.nombre}</option>`);
+                                clienteSelect.append(`<option value="${cliente.id}">${cliente.nombre} ${cliente.apellido}</option>`);
                             });
                         },
                         error: function () {
@@ -587,7 +616,7 @@
             });
 
             // Manejar el envío del formulario
-            $('#formAgregarMontoAhorro').on('submit', function (e) {
+          /*  $('#formAgregarMontoAhorro').on('submit', function (e) {
                 e.preventDefault();
 
                 const formData = new FormData(this);
@@ -613,9 +642,54 @@
                         Swal.fire('Error', 'No se pudo agregar el monto al ahorro.', 'error');
                     }
                 });
-            });
-        });
+            }); */
 
+            // Manejar el envío del formulario de agregar ahorro
+            $('#formAgregarMontoAhorro').on('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                $.ajax({
+                    url: '/functions/agregar_monto_ahorro.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Depósito realizado con éxito',
+                                text: 'El depósito ha sido registrado correctamente.',
+                                icon: 'success',
+                                showCancelButton: true,
+                                allowOutsideClick: false, // Evita que la alerta se cierre automáticamente
+                                allowEscapeKey: false,   // Evita que se cierre con la tecla ESC
+                                confirmButtonText: 'Imprimir Recibo',
+                                cancelButtonText: 'Cerrar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.open(`/functions/generar_recibo_deposito.php?ahorro_id=${data.ahorro_id}`, '_blank');
+                                }
+                                // Recargar la página después de cerrar la alerta
+                                location.reload();
+                            });
+
+                            // Cerrar el modal manualmente después de mostrar la alerta
+                            $('#modalAgregarMontoAhorro').modal('hide');
+
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'No se pudo agregar el monto al ahorro.', 'error');
+                    }
+                });
+            });
+
+
+        });
 
 
             function retirarAhorro(button) {
@@ -659,6 +733,23 @@
                 });
             }
 
+            function generarReciboAhorro(button) {
+                const ahorroId = $(button).data('id');
+
+                Swal.fire({
+                    title: 'Generando recibo...',
+                    text: 'Por favor, espere.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                window.open(`/functions/generar_recibo_ahorro.php?id=${ahorroId}`, '_blank');
+
+                Swal.close();
+            }
+
     </script>
     <script>
 
@@ -681,7 +772,7 @@
                             const socios = data.socios;
                             let options = '<option value="" selected disabled>Seleccione el socio</option>';
                             socios.forEach(socio => {
-                                options += `<option value="${socio.id}" data-ahorro="${socio.ahorro}">${socio.nombre}</option>`;
+                                options += `<option value="${socio.id}" data-ahorro="${socio.ahorro}">${socio.nombre} ${socio.apellido}</option>`;
                             });
                             $('#clienteRetiro').html(options);
                         } else {
