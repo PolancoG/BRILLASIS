@@ -993,7 +993,7 @@
         }
     }); */
 
-
+        /*
         $(document).on('click', '.btnVerOpciones', function () {
             const clienteId = $(this).data('id');
             const cedula = $(this).data('cedula');
@@ -1009,9 +1009,55 @@
 
         // Mostrar la cédula
         $(document).on('click', '.btnVerCedula', function () {
+            const cedulaPath = $(this).data('cedula'); // Obtener la ruta guardada en la BD
+            if (cedulaPath) {
+                $('#cedulaImagen').attr('src', cedulaPath); // Mostrar imagen
+                $('#modalCedula').modal('show');
+                $('#modalOpciones').modal('hide');
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No hay una cédula asociada a este socio.',
+                    showConfirmButton: false,
+                    timer: 2200,
+                });
+            }
+        });
+
+        // Descargar el contrato
+        $(document).on('click', '.btnVerContrato', function () {
+            const contratoPath = $(this).data('contrato'); // Obtener ruta de la BD
+            if (contratoPath) {
+                window.location.href = contratoPath; // Descargar archivo
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No hay un contrato asociado a este socio.',
+                    showConfirmButton: false,
+                    timer: 2200,
+                });
+            }
+        });
+        */
+
+        $(document).on('click', '.btnVerOpciones', function () {
             const clienteId = $(this).data('id');
-            if (clienteId) {
-                const imgPath = `/functions/uploads/cedulas/${clienteId}`;
+            const cedula = $(this).data('cedula');
+            const contrato = $(this).data('contrato');
+
+            // Verifica si hay una cédula y contrato asociados antes de asignarlos
+            $('.btnVerCedula').data('cedula', cedula ? cedula : '');
+            $('.btnVerCedula').data('id', clienteId);
+            $('.btnVerContrato').data('contrato', contrato ? contrato : '');
+            $('.btnVerContrato').data('id', clienteId);
+
+            $('#modalOpciones').modal('show');
+        });
+
+        $(document).on('click', '.btnVerCedula', function () {
+            const cedula = $(this).data('cedula');
+            if (cedula) {
+                const imgPath = `/functions${cedula}`; // Agregar "functions" al inicio de la ruta
                 $('#cedulaImagen').attr('src', imgPath);
                 $('#modalCedula').modal('show');
                 $('#modalOpciones').modal('hide');
@@ -1023,13 +1069,13 @@
                     timer: 2200,
                 });
             }
-        }); 
+        });
 
-        // Descargar el contrato
+       // Descargar el contrato
         $(document).on('click', '.btnVerContrato', function () {
-            const clienteId = $(this).data('id');
-            if (clienteId) {
-                const contractPath = `/functions/uploads/contratos/${clienteId}`;
+            const contrato = $(this).data('contrato');
+            if (contrato) {
+                const contractPath = `/functions${contrato}`; // Agregar "functions" al inicio de la ruta
                 window.location.href = contractPath;
             } else {
                 Swal.fire({
@@ -1040,6 +1086,7 @@
                 });
             }
         });
+
 
     </script>
 

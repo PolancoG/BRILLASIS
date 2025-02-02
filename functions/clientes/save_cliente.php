@@ -34,7 +34,7 @@
     }
 
     // Funciones auxiliares
-    function guardarArchivo($file, $directorioDestino) {
+   /* function guardarArchivo($file, $directorioDestino) {
         if (!is_dir($directorioDestino)) {
             mkdir($directorioDestino, 0777, true);
         }
@@ -46,7 +46,24 @@
             return $rutaArchivo;
         }
         return null;
+    } */
+
+    // Función mejorada para guardar archivos con un nombre limpio
+    function guardarArchivo($file, $directorioDestino) {
+        if (!is_dir($directorioDestino)) {
+            mkdir($directorioDestino, 0777, true);
+        }
+
+        // Generar un nombre único basado en el timestamp y limpiar caracteres especiales
+        $nombreArchivo = uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($file['name']));
+        $rutaArchivo = $directorioDestino . '/' . $nombreArchivo;
+
+        if (move_uploaded_file($file['tmp_name'], $rutaArchivo)) {
+            return $rutaArchivo;  // Devolver la ruta limpia
+        }
+        return null;
     }
+
 
     // Validación del método
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

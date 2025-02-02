@@ -24,6 +24,7 @@
                                     FROM prestamo 
                                     WHERE estado NOT IN ('cancelado', 'activo_terminado')
                                 )
+                                AND estado = 'activo'
                             ");
                             while ($cliente = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 $nombreCompleto = $cliente['nombre'] .' '. $cliente['apellido'];
